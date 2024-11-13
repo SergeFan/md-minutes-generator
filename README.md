@@ -1,10 +1,11 @@
 ## 全体会議事録テンプレートジェネレータ
 
-### 注意
+### What is this repo?
 
-このアプリの UI 開発は現在進行中で、基本機能はまだ動作しません。
+一个从 `Excel` 格式的会议章程文件生成 `Markdown` 格式的会议记录模板的小工具，UI 部分使用 Tauri App 制成。(
+个人用，只支持特定格式的日语文件)
 
-### 技術スタック
+### Tech Stack
 
 - [Rust](https://www.rust-lang.org): A language empowering everyone to build reliable and efficient software.
 - [Tauri Apps](https://tauri.app): Create small, fast, secure, cross-platform applications.
