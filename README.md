@@ -1,5 +1,9 @@
 ## 全体会議事録テンプレートジェネレータ
 
+<p align="center">
+    <img src="./screenshots/wip_screenshot.png" alt="WIP Screenshot"/>
+</p>
+
 ### What is this repo?
 
 一个从 `Excel` 格式的会议章程文件生成 `Markdown` 格式的会议记录模板的小工具，UI 部分使用 Tauri App 制成。(
