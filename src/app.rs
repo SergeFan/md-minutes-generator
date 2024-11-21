@@ -14,6 +14,9 @@ extern "C" {
 
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
     async fn invoke(cmd: &str, args: JsValue) -> JsValue;
+
+    #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "event"])]
+    async fn listen(event: &str, handler: &js_sys::Function) -> JsValue;
 }
 
 #[derive(Serialize, Deserialize)]
@@ -25,6 +28,16 @@ struct FileArgs<'a> {
 
 #[component]
 pub fn App() -> impl IntoView {
+    spawn_local(async move {
+        let closure = Closure::<dyn FnMut(_)>::new(move |s: JsValue| {
+            logging::log!("recv event: {:?}", s);
+        });
+
+        listen("tauri://drag-drop", closure.as_ref().unchecked_ref()).await;
+
+        closure.forget();
+    });
+
     let file_path = RwSignal::new(String::new());
     let markdown_path = RwSignal::new(String::new());
     let options = RwSignal::new(Vec::new());
