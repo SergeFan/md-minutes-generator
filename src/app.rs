@@ -2,6 +2,7 @@ use js_sys::try_iter;
 use leptos::ev::MouseEvent;
 use leptos::*;
 use serde::{Deserialize, Serialize};
+use serde_wasm_bindgen::from_value;
 use std::convert::Into;
 use thaw::*;
 use wasm_bindgen::prelude::*;
@@ -26,11 +27,43 @@ struct FileArgs<'a> {
     sheet: &'a str,
 }
 
+#[derive(Debug, Deserialize)]
+struct Object {
+    id: u32,
+    event: String,
+    payload: Payload,
+}
+
+#[derive(Debug, Deserialize)]
+struct Payload {
+    paths: Vec<String>,
+    position: Position,
+}
+
+#[derive(Debug, Deserialize)]
+struct Position {
+    x: u32,
+    y: u32,
+}
+
 #[component]
 pub fn App() -> impl IntoView {
+    let file_path = RwSignal::new(String::new());
+    let markdown_path = RwSignal::new(String::new());
+    let options = RwSignal::new(Vec::new());
+    let value = RwSignal::new(None::<String>);
+
     spawn_local(async move {
-        let closure = Closure::<dyn FnMut(_)>::new(move |s: JsValue| {
-            logging::log!("recv event: {:?}", s);
+        let closure = Closure::<dyn FnMut(_)>::new(move |js_value: JsValue| {
+            match from_value::<Object>(js_value) {
+                Ok(data) => {
+                    logging::log!("recv event: {:?}", data);
+                    if let Some(path) = data.payload.paths.first() {
+                        file_path.set(path.to_owned());
+                    }
+                }
+                Err(err) => logging::error!("error: {:?}", err),
+            }
         });
 
         listen("tauri://drag-drop", closure.as_ref().unchecked_ref()).await;
@@ -38,52 +71,24 @@ pub fn App() -> impl IntoView {
         closure.forget();
     });
 
-    let file_path = RwSignal::new(String::new());
-    let markdown_path = RwSignal::new(String::new());
-    let options = RwSignal::new(Vec::new());
-    let value = RwSignal::new(None::<String>);
+    create_effect(move |_| {
+        if !file_path.get().is_empty() {
+            spawn_local(async move {
+                setup_output_options(&file_path.get_untracked(), markdown_path, options, value)
+                    .await;
+            });
+        }
+    });
 
     let select_file = move |ev: MouseEvent| {
         ev.prevent_default();
         spawn_local(async move {
-            // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
             let selected_file = invoke_without_args("select_file")
                 .await
                 .as_string()
                 .unwrap();
 
-            if !selected_file.is_empty() {
-                file_path.set(selected_file.to_owned());
-                if markdown_path.get_untracked().is_empty() {
-                    markdown_path.set(
-                        invoke_without_args("get_desktop_dir")
-                            .await
-                            .as_string()
-                            .unwrap(),
-                    );
-                }
-
-                let args = serde_wasm_bindgen::to_value(&FileArgs {
-                    input: &selected_file,
-                    output: "",
-                    sheet: "",
-                })
-                .unwrap();
-                let js_value: JsValue = invoke("read_excel", args).await;
-
-                if let Ok(Some(js_iterator)) = try_iter(&js_value) {
-                    let option_strings = js_iterator
-                        .filter_map(|item| item.ok().unwrap().as_string())
-                        .map(|item| SelectOption::new(item.to_owned(), item))
-                        .collect();
-
-                    options.set(option_strings);
-
-                    if let Some(first_option) = options.get().first() {
-                        value.set(Some(first_option.label.to_owned()));
-                    }
-                }
-            }
+            file_path.set(selected_file.to_owned());
         });
     };
 
@@ -170,5 +175,42 @@ pub fn App() -> impl IntoView {
             </GridItem>
             </Grid>
         </main>
+    }
+}
+
+async fn setup_output_options(
+    selected_file: &str,
+    markdown_path: RwSignal<String>,
+    options: RwSignal<Vec<SelectOption<String>>>,
+    value: RwSignal<Option<String>>,
+) {
+    if markdown_path.get_untracked().is_empty() {
+        markdown_path.set(
+            invoke_without_args("get_desktop_dir")
+                .await
+                .as_string()
+                .unwrap(),
+        );
+    }
+
+    let args = serde_wasm_bindgen::to_value(&FileArgs {
+        input: selected_file,
+        output: "",
+        sheet: "",
+    })
+    .unwrap();
+    let js_value: JsValue = invoke("read_excel", args).await;
+
+    if let Ok(Some(js_iterator)) = try_iter(&js_value) {
+        let option_strings = js_iterator
+            .filter_map(|item| item.ok().unwrap().as_string())
+            .map(|item| SelectOption::new(item.to_owned(), item))
+            .collect();
+
+        options.set(option_strings);
+
+        if let Some(first_option) = options.get().first() {
+            value.set(Some(first_option.label.to_owned()));
+        }
     }
 }
