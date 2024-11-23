@@ -1,0 +1,5 @@
+# ver. 0.5
+ - Add drag & drop support (simply drag-drop input file to the window)
+
+# ver. 0.4
+ - Add basic UI to select input path, output path and worksheet
