@@ -16,6 +16,7 @@ extern "C" {
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
     async fn invoke(cmd: &str, args: JsValue) -> JsValue;
 
+    // Tauri event listener
     #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "event"])]
     async fn listen(event: &str, handler: &js_sys::Function) -> JsValue;
 }
@@ -53,6 +54,7 @@ pub fn App() -> impl IntoView {
     let options = RwSignal::new(Vec::new());
     let value = RwSignal::new(None::<String>);
 
+    // Drag & drop handler
     spawn_local(async move {
         let closure = Closure::<dyn FnMut(_)>::new(move |js_value: JsValue| {
             match from_value::<Object>(js_value) {
@@ -80,6 +82,7 @@ pub fn App() -> impl IntoView {
         }
     });
 
+    // File select handler
     let select_file = move |ev: MouseEvent| {
         ev.prevent_default();
         spawn_local(async move {
@@ -152,7 +155,7 @@ pub fn App() -> impl IntoView {
                     <img src="public/leptos.svg" class="logo leptos" alt="Leptos logo"/>
                 </a>
             </div>
-            <p>"Click on the Tauri and Leptos logos to learn more."</p>
+            <p>"Click button to select input or simply drag-drop your file."</p>
 
             <Grid cols=5 x_gap=8 y_gap=8>
             <GridItem offset=1 column=2>
