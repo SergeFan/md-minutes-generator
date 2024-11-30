@@ -28,20 +28,20 @@ struct FileArgs<'a> {
     sheet: &'a str,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Object {
     id: u32,
     event: String,
     payload: Payload,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Payload {
     paths: Vec<String>,
     position: Position,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 struct Position {
     x: u32,
     y: u32,
