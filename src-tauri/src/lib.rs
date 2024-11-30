@@ -2,7 +2,6 @@ mod file_process;
 
 use directories::UserDirs;
 use std::convert::From;
-use tauri::AppHandle;
 use tauri_plugin_dialog::DialogExt;
 
 #[tauri::command]
@@ -21,7 +20,7 @@ fn get_desktop_dir() -> String {
 }
 
 #[tauri::command]
-async fn select_file(app_handle: AppHandle) -> String {
+async fn select_file(app_handle: tauri::AppHandle) -> String {
     if let Some(user_dirs) = UserDirs::new() {
         let file_path = app_handle
             .dialog()
@@ -40,7 +39,7 @@ async fn select_file(app_handle: AppHandle) -> String {
 }
 
 #[tauri::command]
-async fn select_path(app_handle: AppHandle) -> String {
+async fn select_path(app_handle: tauri::AppHandle) -> String {
     if let Some(user_dirs) = UserDirs::new() {
         let file_path = app_handle
             .dialog()
@@ -67,7 +66,7 @@ fn read_excel(input: &str, _: Option<&str>, _: Option<&str>) -> Vec<String> {
 }
 
 #[tauri::command]
-fn generate_markdown(app_handle: AppHandle, input: &str, output: &str, sheet: &str) -> bool {
+fn generate_markdown(app_handle: tauri::AppHandle, input: &str, output: &str, sheet: &str) -> bool {
     if output.is_empty() || sheet.is_empty() {
         return false;
     }
