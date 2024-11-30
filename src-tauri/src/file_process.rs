@@ -4,9 +4,7 @@ use std::ffi::OsString;
 use std::fs::File;
 use std::io::{LineWriter, Write};
 use std::path::Path;
-use tauri::AppHandle;
-use tauri_plugin_fs::FsExt;
-use tauri_plugin_fs::OpenOptions;
+use tauri_plugin_fs::{FsExt, OpenOptions};
 
 pub fn read_excel(input_path: &str) -> anyhow::Result<Vec<String>> {
     // Load Excel data
@@ -28,7 +26,7 @@ pub fn read_excel(input_path: &str) -> anyhow::Result<Vec<String>> {
 }
 
 pub fn generate_markdown(
-    app_handle: AppHandle,
+    app_handle: tauri::AppHandle,
     input_path: &str,
     output_path: &str,
     sheet_name: &str,
