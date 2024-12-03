@@ -162,19 +162,19 @@ pub fn App() -> impl IntoView {
                 <Input value=file_path placeholder="Select input excel path..."/>
             </GridItem>
             <GridItem>
-                <Button on:click=select_file variant=ButtonVariant::Primary>"Input Path"</Button>
+                <Button block=true on:click=select_file variant=ButtonVariant::Primary>"Input Path"</Button>
             </GridItem>
             <GridItem offset=1 column=2>
                 <Input value=markdown_path placeholder="Select output markdown path..."/>
             </GridItem>
             <GridItem>
-                <Button on:click=select_path variant=ButtonVariant::Primary>"Output Path"</Button>
+                <Button block=true on:click=select_path variant=ButtonVariant::Primary>"Output Path"</Button>
             </GridItem>
             <GridItem offset=1 column=2>
                 <Select value options />
             </GridItem>
             <GridItem>
-                <Button on:click=generate_markdown color=ButtonColor::Success>"Generate!"</Button>
+                <Button block=true on:click=generate_markdown color=ButtonColor::Success>"Generate!"</Button>
             </GridItem>
             </Grid>
         </main>
