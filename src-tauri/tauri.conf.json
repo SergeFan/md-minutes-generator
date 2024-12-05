@@ -35,7 +35,13 @@
     ],
     "windows": {
       "nsis": {
-        "displayLanguageSelector": true
+        "installMode": "perMachine",
+        "displayLanguageSelector": true,
+        "languages": [
+          "English",
+          "SimpChinese",
+          "Japanese"
+        ]
       }
     }
   }
