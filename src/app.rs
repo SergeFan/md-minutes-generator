@@ -1,6 +1,5 @@
 use js_sys::try_iter;
 use leptos::ev::MouseEvent;
-use leptos::html::Button;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::*;
@@ -183,9 +182,7 @@ pub fn App() -> impl IntoView {
                 <Button on:click=select_path appearance=ButtonAppearance::Secondary>"Output Path"</Button>
             </GridItem>
             <GridItem offset=1 column=2>
-                <Select value>
-                    <option>"bac"</option>
-                </Select>
+                <Input value=markdown_path placeholder="Select output markdown path..."/>
             </GridItem>
             <GridItem>
                 <Button on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
