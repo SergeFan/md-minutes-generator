@@ -1,5 +1,7 @@
 use js_sys::try_iter;
 use leptos::ev::MouseEvent;
+use leptos::prelude::*;
+use leptos::task::spawn_local;
 use leptos::*;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::from_value;
@@ -73,7 +75,7 @@ pub fn App() -> impl IntoView {
         closure.forget();
     });
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         if !file_path.get().is_empty() {
             spawn_local(async move {
                 setup_output_options(&file_path.get_untracked(), markdown_path, options, value)
@@ -109,7 +111,7 @@ pub fn App() -> impl IntoView {
         })
     };
 
-    let message = use_message();
+    let toaster = ToasterInjection::expect_context();
 
     let generate_markdown = move |ev: MouseEvent| {
         ev.prevent_default();
@@ -127,16 +129,25 @@ pub fn App() -> impl IntoView {
                 let js_value: JsValue = invoke("generate_markdown", args).await;
 
                 if js_value.as_bool().unwrap_or(false) {
-                    message.create(
-                        format!("Markdown file has been generated at '{}'.", selected_path),
-                        MessageVariant::Success,
-                        Default::default(),
-                    );
+                    toaster.dispatch_toast(move || view! {
+                        <Toast>
+                            <ToastTitle>"Generation completed"</ToastTitle>
+                            <ToastBody>move || {format!("Markdown file has been generated at '{}'.", selected_path)}</ToastBody>
+                        </Toast>
+                    }, ToastOptions::default().with_position(ToastPosition::Top).with_intent(ToastIntent::Success));
                 } else {
-                    message.create(
-                        "Markdown generation failed.".into(),
-                        MessageVariant::Error,
-                        Default::default(),
+                    toaster.dispatch_toast(
+                        move || {
+                            view! {
+                                <Toast>
+                                    <ToastTitle>"Generation failed"</ToastTitle>
+                                    <ToastBody>"Markdown generation has been cancelled."</ToastBody>
+                                </Toast>
+                            }
+                        },
+                        ToastOptions::default()
+                            .with_position(ToastPosition::Top)
+                            .with_intent(ToastIntent::Error),
                     );
                 }
             };
@@ -162,19 +173,19 @@ pub fn App() -> impl IntoView {
                 <Input value=file_path placeholder="Select input excel path..."/>
             </GridItem>
             <GridItem>
-                <Button block=true on:click=select_file variant=ButtonVariant::Primary>"Input Path"</Button>
+                <Button block=true on:click=select_file appearance=ButtonAppearance::Secondary>"Input Path"</Button>
             </GridItem>
             <GridItem offset=1 column=2>
                 <Input value=markdown_path placeholder="Select output markdown path..."/>
             </GridItem>
             <GridItem>
-                <Button block=true on:click=select_path variant=ButtonVariant::Primary>"Output Path"</Button>
+                <Button block=true on:click=select_path appearance=ButtonAppearance::Secondary>"Output Path"</Button>
             </GridItem>
             <GridItem offset=1 column=2>
-                <Select value options />
+                <Input value=markdown_path placeholder="Select output markdown path..."/>
             </GridItem>
             <GridItem>
-                <Button block=true on:click=generate_markdown color=ButtonColor::Success>"Generate!"</Button>
+                <Button block=true on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
             </GridItem>
             </Grid>
         </main>
@@ -184,7 +195,7 @@ pub fn App() -> impl IntoView {
 async fn setup_output_options(
     selected_file: &str,
     markdown_path: RwSignal<String>,
-    options: RwSignal<Vec<SelectOption<String>>>,
+    options: RwSignal<Vec<String>>,
     value: RwSignal<Option<String>>,
 ) {
     if markdown_path.get_untracked().is_empty() {
@@ -207,13 +218,12 @@ async fn setup_output_options(
     if let Ok(Some(js_iterator)) = try_iter(&js_value) {
         let option_strings = js_iterator
             .filter_map(|item| item.ok().unwrap().as_string())
-            .map(|item| SelectOption::new(item.to_owned(), item))
             .collect();
 
         options.set(option_strings);
 
         if let Some(first_option) = options.get().first() {
-            value.set(Some(first_option.label.to_owned()));
+            value.set(Some(first_option.to_owned()));
         }
     }
 }
