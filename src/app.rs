@@ -132,7 +132,7 @@ pub fn App() -> impl IntoView {
                     toaster.dispatch_toast(move || view! {
                         <Toast>
                             <ToastTitle>"Generation completed"</ToastTitle>
-                            <ToastBody>move || {format!("Markdown file has been generated at '{}'.", selected_path)}</ToastBody>
+                            <ToastBody>{format!("Markdown file has been generated at '{}'.", selected_path)}</ToastBody>
                         </Toast>
                     }, ToastOptions::default().with_position(ToastPosition::Top).with_intent(ToastIntent::Success));
                 } else {
@@ -170,19 +170,25 @@ pub fn App() -> impl IntoView {
 
             <Grid cols=5 x_gap=8 y_gap=8>
             <GridItem offset=1 column=2>
-                <Input value=file_path placeholder="Select input excel path..."/>
+                <Field>
+                    <Input value=file_path placeholder="Select input excel path..."/>
+                </Field>
             </GridItem>
             <GridItem>
                 <Button block=true on:click=select_file appearance=ButtonAppearance::Secondary>"Input Path"</Button>
             </GridItem>
             <GridItem offset=1 column=2>
-                <Input value=markdown_path placeholder="Select output markdown path..."/>
+                <Field>
+                    <Input value=markdown_path placeholder="Select output markdown path..."/>
+                </Field>
             </GridItem>
             <GridItem>
                 <Button block=true on:click=select_path appearance=ButtonAppearance::Secondary>"Output Path"</Button>
             </GridItem>
             <GridItem offset=1 column=2>
-                <Input value=markdown_path placeholder="Select output markdown path..."/>
+                <Select>
+                    <option>"Dummy"</option>
+                </Select>
             </GridItem>
             <GridItem>
                 <Button block=true on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
