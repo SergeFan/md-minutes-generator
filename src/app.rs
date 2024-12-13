@@ -187,7 +187,15 @@ pub fn App() -> impl IntoView {
             </GridItem>
             <GridItem offset=1 column=2>
                 <Select>
-                    <option>"Dummy"</option>
+                    <For
+                        each=move || options.get()
+                        key=move |select_option| select_option.clone()
+                        children=move |select_option| {
+                            view!{
+                                <option>{select_option}</option>
+                            }
+                        }
+                    />
                 </Select>
             </GridItem>
             <GridItem>
@@ -222,14 +230,14 @@ async fn setup_output_options(
     let js_value: JsValue = invoke("read_excel", args).await;
 
     if let Ok(Some(js_iterator)) = try_iter(&js_value) {
-        let option_strings = js_iterator
+        let option_strings: Vec<String> = js_iterator
             .filter_map(|item| item.ok().unwrap().as_string())
             .collect();
 
-        options.set(option_strings);
-
-        if let Some(first_option) = options.get().first() {
+        if let Some(first_option) = option_strings.first() {
             value.set(Some(first_option.to_owned()));
         }
+
+        options.set(option_strings);
     }
 }
