@@ -53,8 +53,8 @@ struct Position {
 pub fn App() -> impl IntoView {
     let file_path = RwSignal::new(String::new());
     let markdown_path = RwSignal::new(String::new());
-    let options = RwSignal::new(Vec::new());
-    let value = RwSignal::new(None::<String>);
+    let worksheet_options = RwSignal::new(Vec::new());
+    let selected_worksheet = RwSignal::new(None::<String>);
 
     // Drag & drop handler
     spawn_local(async move {
@@ -78,8 +78,13 @@ pub fn App() -> impl IntoView {
     Effect::new(move |_| {
         if !file_path.get().is_empty() {
             spawn_local(async move {
-                setup_output_options(&file_path.get_untracked(), markdown_path, options, value)
-                    .await;
+                setup_output_options(
+                    &file_path.get_untracked(),
+                    markdown_path,
+                    worksheet_options,
+                    selected_worksheet,
+                )
+                .await;
             });
         }
     });
@@ -118,7 +123,7 @@ pub fn App() -> impl IntoView {
         spawn_local(async move {
             let selected_file = file_path.get();
             let selected_path = markdown_path.get();
-            if let Some(selected_sheet) = value.get() {
+            if let Some(selected_sheet) = selected_worksheet.get() {
                 let args = serde_wasm_bindgen::to_value(&FileArgs {
                     input: selected_file.as_str(),
                     output: selected_path.as_str(),
@@ -188,11 +193,11 @@ pub fn App() -> impl IntoView {
             <GridItem offset=1 column=2>
                 <Select>
                     <For
-                        each=move || options.get()
-                        key=move |select_option| select_option.clone()
-                        children=move |select_option| {
+                        each=move || worksheet_options.get()
+                        key=move |worksheet_option| worksheet_option.clone()
+                        children=move |worksheet_option| {
                             view!{
-                                <option>{select_option}</option>
+                                <option>{worksheet_option}</option>
                             }
                         }
                     />
@@ -209,8 +214,8 @@ pub fn App() -> impl IntoView {
 async fn setup_output_options(
     selected_file: &str,
     markdown_path: RwSignal<String>,
-    options: RwSignal<Vec<String>>,
-    value: RwSignal<Option<String>>,
+    worksheet_options: RwSignal<Vec<String>>,
+    selected_worksheet: RwSignal<Option<String>>,
 ) {
     if markdown_path.get_untracked().is_empty() {
         markdown_path.set(
@@ -230,14 +235,14 @@ async fn setup_output_options(
     let js_value: JsValue = invoke("read_excel", args).await;
 
     if let Ok(Some(js_iterator)) = try_iter(&js_value) {
-        let option_strings: Vec<String> = js_iterator
+        let options: Vec<String> = js_iterator
             .filter_map(|item| item.ok().unwrap().as_string())
             .collect();
 
-        if let Some(first_option) = option_strings.first() {
-            value.set(Some(first_option.to_owned()));
+        if let Some(first_option) = options.first() {
+            selected_worksheet.set(Some(first_option.to_owned()));
         }
 
-        options.set(option_strings);
+        worksheet_options.set(options);
     }
 }
