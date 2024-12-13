@@ -1,5 +1,7 @@
 use js_sys::try_iter;
 use leptos::ev::MouseEvent;
+use leptos::prelude::*;
+use leptos::task::spawn_local;
 use leptos::*;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::from_value;
@@ -51,8 +53,8 @@ struct Position {
 pub fn App() -> impl IntoView {
     let file_path = RwSignal::new(String::new());
     let markdown_path = RwSignal::new(String::new());
-    let options = RwSignal::new(Vec::new());
-    let value = RwSignal::new(None::<String>);
+    let worksheet_options = RwSignal::new(Vec::new());
+    let selected_worksheet = RwSignal::new(None::<String>);
 
     // Drag & drop handler
     spawn_local(async move {
@@ -73,11 +75,16 @@ pub fn App() -> impl IntoView {
         closure.forget();
     });
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         if !file_path.get().is_empty() {
             spawn_local(async move {
-                setup_output_options(&file_path.get_untracked(), markdown_path, options, value)
-                    .await;
+                setup_output_options(
+                    &file_path.get_untracked(),
+                    markdown_path,
+                    worksheet_options,
+                    selected_worksheet,
+                )
+                .await;
             });
         }
     });
@@ -109,14 +116,14 @@ pub fn App() -> impl IntoView {
         })
     };
 
-    let message = use_message();
+    let toaster = ToasterInjection::expect_context();
 
     let generate_markdown = move |ev: MouseEvent| {
         ev.prevent_default();
         spawn_local(async move {
             let selected_file = file_path.get();
             let selected_path = markdown_path.get();
-            if let Some(selected_sheet) = value.get() {
+            if let Some(selected_sheet) = selected_worksheet.get() {
                 let args = serde_wasm_bindgen::to_value(&FileArgs {
                     input: selected_file.as_str(),
                     output: selected_path.as_str(),
@@ -127,16 +134,25 @@ pub fn App() -> impl IntoView {
                 let js_value: JsValue = invoke("generate_markdown", args).await;
 
                 if js_value.as_bool().unwrap_or(false) {
-                    message.create(
-                        format!("Markdown file has been generated at '{}'.", selected_path),
-                        MessageVariant::Success,
-                        Default::default(),
-                    );
+                    toaster.dispatch_toast(move || view! {
+                        <Toast>
+                            <ToastTitle>"Generation completed"</ToastTitle>
+                            <ToastBody>{format!("Markdown file has been generated at '{}'.", selected_path)}</ToastBody>
+                        </Toast>
+                    }, ToastOptions::default().with_position(ToastPosition::Top).with_intent(ToastIntent::Success));
                 } else {
-                    message.create(
-                        "Markdown generation failed.".into(),
-                        MessageVariant::Error,
-                        Default::default(),
+                    toaster.dispatch_toast(
+                        move || {
+                            view! {
+                                <Toast>
+                                    <ToastTitle>"Generation failed"</ToastTitle>
+                                    <ToastBody>"Markdown generation has been cancelled."</ToastBody>
+                                </Toast>
+                            }
+                        },
+                        ToastOptions::default()
+                            .with_position(ToastPosition::Top)
+                            .with_intent(ToastIntent::Error),
                     );
                 }
             };
@@ -155,26 +171,45 @@ pub fn App() -> impl IntoView {
                     <img src="public/leptos.svg" class="logo leptos" alt="Leptos logo"/>
                 </a>
             </div>
-            <p>"Click button to select input or simply drag-drop your file."</p>
+
+            <p>
+                <b>"Click the button"</b>" to select your input path"<br/>
+                "OR"<br/>
+                <b>"Drag & drop"</b>" your file to the App window"
+            </p>
 
             <Grid cols=5 x_gap=8 y_gap=8>
             <GridItem offset=1 column=2>
-                <Input value=file_path placeholder="Select input excel path..."/>
+                <Field>
+                    <Input value=file_path placeholder="Select input excel path..."/>
+                </Field>
             </GridItem>
             <GridItem>
-                <Button block=true on:click=select_file variant=ButtonVariant::Primary>"Input Path"</Button>
+                <Button block=true on:click=select_file appearance=ButtonAppearance::Secondary>"Input Path"</Button>
             </GridItem>
             <GridItem offset=1 column=2>
-                <Input value=markdown_path placeholder="Select output markdown path..."/>
+                <Field>
+                    <Input value=markdown_path placeholder="Select output markdown path..."/>
+                </Field>
             </GridItem>
             <GridItem>
-                <Button block=true on:click=select_path variant=ButtonVariant::Primary>"Output Path"</Button>
+                <Button block=true on:click=select_path appearance=ButtonAppearance::Secondary>"Output Path"</Button>
             </GridItem>
             <GridItem offset=1 column=2>
-                <Select value options />
+                <Select>
+                    <For
+                        each=move || worksheet_options.get()
+                        key=move |worksheet_option| worksheet_option.clone()
+                        children=move |worksheet_option| {
+                            view!{
+                                <option>{worksheet_option}</option>
+                            }
+                        }
+                    />
+                </Select>
             </GridItem>
             <GridItem>
-                <Button block=true on:click=generate_markdown color=ButtonColor::Success>"Generate!"</Button>
+                <Button block=true on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
             </GridItem>
             </Grid>
         </main>
@@ -184,8 +219,8 @@ pub fn App() -> impl IntoView {
 async fn setup_output_options(
     selected_file: &str,
     markdown_path: RwSignal<String>,
-    options: RwSignal<Vec<SelectOption<String>>>,
-    value: RwSignal<Option<String>>,
+    worksheet_options: RwSignal<Vec<String>>,
+    selected_worksheet: RwSignal<Option<String>>,
 ) {
     if markdown_path.get_untracked().is_empty() {
         markdown_path.set(
@@ -205,15 +240,14 @@ async fn setup_output_options(
     let js_value: JsValue = invoke("read_excel", args).await;
 
     if let Ok(Some(js_iterator)) = try_iter(&js_value) {
-        let option_strings = js_iterator
+        let options: Vec<String> = js_iterator
             .filter_map(|item| item.ok().unwrap().as_string())
-            .map(|item| SelectOption::new(item.to_owned(), item))
             .collect();
 
-        options.set(option_strings);
-
-        if let Some(first_option) = options.get().first() {
-            value.set(Some(first_option.label.to_owned()));
+        if let Some(first_option) = options.first() {
+            selected_worksheet.set(Some(first_option.to_owned()));
         }
+
+        worksheet_options.set(options);
     }
 }
