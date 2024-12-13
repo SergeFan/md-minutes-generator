@@ -171,7 +171,12 @@ pub fn App() -> impl IntoView {
                     <img src="public/leptos.svg" class="logo leptos" alt="Leptos logo"/>
                 </a>
             </div>
-            <p>"Click button to select input or simply drag-drop your file."</p>
+
+            <p>
+                <b>"Click the button"</b>" to select your input path"<br/>
+                "OR"<br/>
+                <b>"Drag & drop"</b>" your file to the App window"
+            </p>
 
             <Grid cols=5 x_gap=8 y_gap=8>
             <GridItem offset=1 column=2>
