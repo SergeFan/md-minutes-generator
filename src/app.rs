@@ -141,7 +141,7 @@ pub fn App() -> impl IntoView {
                             view! {
                                 <Toast>
                                     <ToastTitle>"Generation completed"</ToastTitle>
-                                    <ToastBody>"Markdown file has been generated."</ToastBody>
+                                    <ToastBody>"Markdown generation succeeded."</ToastBody>
                                 </Toast>
                             }
                         },
@@ -162,7 +162,8 @@ pub fn App() -> impl IntoView {
                         },
                         ToastOptions::default()
                             .with_position(ToastPosition::Top)
-                            .with_intent(ToastIntent::Error),
+                            .with_intent(ToastIntent::Error)
+                            .with_timeout(Duration::from_secs(5)),
                     );
                 }
             };
