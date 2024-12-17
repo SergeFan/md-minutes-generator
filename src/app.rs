@@ -118,6 +118,41 @@ pub fn App() -> impl IntoView {
         })
     };
 
+    let is_worksheet_selected = move || {
+        if let Some(selected_worksheet) = selected_worksheet.get() {
+            let today = Local::now().format("%Y%m%d").to_string();
+            if selected_worksheet == today {
+                return view! {
+                    <MessageBar intent=MessageBarIntent::Success>
+                        <MessageBarBody>
+                            <MessageBarTitle>"Date matched"</MessageBarTitle>
+                            "Today's worksheet has been found, you can generate now."
+                        </MessageBarBody>
+                    </MessageBar>
+                };
+            }
+
+            return view! {
+                <MessageBar intent=MessageBarIntent::Warning>
+                    <MessageBarBody>
+                        <MessageBarTitle>"Date mismatched"</MessageBarTitle>
+                        "No worksheet matches today, please select one to generate."
+                    </MessageBarBody>
+                </MessageBar>
+            };
+        };
+
+        view! {
+            <MessageBar intent=MessageBarIntent::Info>
+                <MessageBarBody>
+                    <MessageBarTitle>"Excel not found"</MessageBarTitle>
+                    "No excel has been found, please select one to proceed."
+                </MessageBarBody>
+            </MessageBar>
+        }
+    };
+
+    // Generate markdown
     let toaster = ToasterInjection::expect_context();
 
     let generate_markdown = move |ev: MouseEvent| {
@@ -168,40 +203,6 @@ pub fn App() -> impl IntoView {
                 }
             };
         })
-    };
-
-    let is_markdown_selected = move || {
-        if let Some(selected_worksheet) = selected_worksheet.get() {
-            let today = Local::now().format("%Y%m%d").to_string();
-            if selected_worksheet == today {
-                return view! {
-                    <MessageBar intent=MessageBarIntent::Success>
-                        <MessageBarBody>
-                            <MessageBarTitle>"Date matched"</MessageBarTitle>
-                            "Today's worksheet has been found, you can generate now."
-                        </MessageBarBody>
-                    </MessageBar>
-                };
-            }
-
-            return view! {
-                <MessageBar intent=MessageBarIntent::Warning>
-                    <MessageBarBody>
-                        <MessageBarTitle>"Date mismatched"</MessageBarTitle>
-                        "No worksheet matches today, please select one to generate."
-                    </MessageBarBody>
-                </MessageBar>
-            };
-        };
-
-        view! {
-            <MessageBar intent=MessageBarIntent::Info>
-                <MessageBarBody>
-                    <MessageBarTitle>"Excel not found"</MessageBarTitle>
-                    "No excel has been found, please select one to proceed."
-                </MessageBarBody>
-            </MessageBar>
-        }
     };
 
     view! {
@@ -261,7 +262,7 @@ pub fn App() -> impl IntoView {
             <br/>
 
             <Flex align=FlexAlign::End justify=FlexJustify::Center>
-                {is_markdown_selected}
+                {is_worksheet_selected}
             </Flex>
         </main>
     }
