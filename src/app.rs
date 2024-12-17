@@ -1,3 +1,4 @@
+use chrono::prelude::*;
 use js_sys::try_iter;
 use leptos::ev::MouseEvent;
 use leptos::prelude::*;
@@ -159,6 +160,40 @@ pub fn App() -> impl IntoView {
         })
     };
 
+    let is_markdown_selected = move || {
+        if let Some(selected_worksheet) = selected_worksheet.get() {
+            let today = Local::now().format("%Y%m%d").to_string();
+            if selected_worksheet == today {
+                return view! {
+                    <MessageBar intent=MessageBarIntent::Success>
+                        <MessageBarBody>
+                            <MessageBarTitle>"Date matched"</MessageBarTitle>
+                            "Today's worksheet has been found, you can generate now."
+                        </MessageBarBody>
+                    </MessageBar>
+                };
+            }
+
+            return view! {
+                <MessageBar intent=MessageBarIntent::Warning>
+                    <MessageBarBody>
+                        <MessageBarTitle>"Date mismatched"</MessageBarTitle>
+                        "No worksheet matches today, please select one to generate."
+                    </MessageBarBody>
+                </MessageBar>
+            };
+        };
+
+        view! {
+            <MessageBar intent=MessageBarIntent::Info>
+                <MessageBarBody>
+                    <MessageBarTitle>"Excel not found"</MessageBarTitle>
+                    "No excel has been found, please select one to proceed."
+                </MessageBarBody>
+            </MessageBar>
+        }
+    };
+
     view! {
         <main class="container">
             <h1>"Powered by Tauri + Leptos"</h1>
@@ -212,6 +247,12 @@ pub fn App() -> impl IntoView {
                 <Button block=true on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
             </GridItem>
             </Grid>
+
+            <br/>
+
+            <Flex align=FlexAlign::End justify=FlexJustify::Center>
+                {is_markdown_selected}
+            </Flex>
         </main>
     }
 }
