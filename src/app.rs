@@ -7,6 +7,7 @@ use leptos::*;
 use serde::{Deserialize, Serialize};
 use serde_wasm_bindgen::from_value;
 use std::convert::Into;
+use std::time::Duration;
 use thaw::*;
 use wasm_bindgen::prelude::*;
 
@@ -135,12 +136,20 @@ pub fn App() -> impl IntoView {
                 let js_value: JsValue = invoke("generate_markdown", args).await;
 
                 if js_value.as_bool().unwrap_or(false) {
-                    toaster.dispatch_toast(move || view! {
-                        <Toast>
-                            <ToastTitle>"Generation completed"</ToastTitle>
-                            <ToastBody>{format!("Markdown file has been generated at '{}'.", selected_path)}</ToastBody>
-                        </Toast>
-                    }, ToastOptions::default().with_position(ToastPosition::Top).with_intent(ToastIntent::Success));
+                    toaster.dispatch_toast(
+                        move || {
+                            view! {
+                                <Toast>
+                                    <ToastTitle>"Generation completed"</ToastTitle>
+                                    <ToastBody>"Markdown file has been generated."</ToastBody>
+                                </Toast>
+                            }
+                        },
+                        ToastOptions::default()
+                            .with_position(ToastPosition::Top)
+                            .with_intent(ToastIntent::Success)
+                            .with_timeout(Duration::from_secs(5)),
+                    );
                 } else {
                     toaster.dispatch_toast(
                         move || {
