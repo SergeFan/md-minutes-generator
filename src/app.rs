@@ -111,43 +111,43 @@ pub fn App() -> impl IntoView {
             </p>
 
             <Grid cols=5 x_gap=8 y_gap=8>
-            <GridItem offset=1 column=2>
-                <Field>
-                    <Input value=file_path placeholder="Select input excel path..."/>
-                </Field>
-            </GridItem>
-            <GridItem>
-                <Button block=true on:click=select_file appearance=ButtonAppearance::Secondary>"Input Path"</Button>
-            </GridItem>
-            <GridItem offset=1 column=2>
-                <Field>
-                    <Input value=markdown_path placeholder="Select output markdown path..."/>
-                </Field>
-            </GridItem>
-            <GridItem>
-                <Button block=true on:click=select_path appearance=ButtonAppearance::Secondary>"Output Path"</Button>
-            </GridItem>
-            <GridItem offset=1 column=2>
-                <Select>
-                    <For
-                        each=move || worksheet_options.get()
-                        key=move |worksheet_option| worksheet_option.clone()
-                        children=move |worksheet_option| {
-                            view!{
-                                <option>{worksheet_option}</option>
+                <GridItem offset=1 column=2>
+                    <Field>
+                        <Input value=file_path placeholder="Select input excel path..."/>
+                    </Field>
+                </GridItem>
+                <GridItem>
+                    <Button block=true on:click=select_file appearance=ButtonAppearance::Secondary>"Input Path"</Button>
+                </GridItem>
+                <GridItem offset=1 column=2>
+                    <Field>
+                        <Input value=markdown_path placeholder="Select output markdown path..."/>
+                    </Field>
+                </GridItem>
+                <GridItem>
+                    <Button block=true on:click=select_path appearance=ButtonAppearance::Secondary>"Output Path"</Button>
+                </GridItem>
+                <GridItem offset=1 column=2>
+                    <Select>
+                        <For
+                            each=move || worksheet_options.get()
+                            key=move |worksheet_option| worksheet_option.clone()
+                            children=move |worksheet_option| {
+                                view!{
+                                    <option>{worksheet_option}</option>
+                                }
                             }
-                        }
-                    />
-                </Select>
-            </GridItem>
-            <GridItem>
-                <Button block=true on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
-            </GridItem>
+                        />
+                    </Select>
+                </GridItem>
+                <GridItem>
+                    <Button block=true on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
+                </GridItem>
             </Grid>
 
             <br/>
 
-            <Flex align=FlexAlign::End justify=FlexJustify::Center>
+            <Flex justify=FlexJustify::Center>
                 {is_worksheet_selected}
             </Flex>
         </main>
