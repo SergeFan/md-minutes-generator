@@ -1,7 +1,7 @@
-use chrono::prelude::*;
 use leptos::ev::MouseEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
+use md_minutes_generator_ui::component::message_bar::FileStatus;
 use md_minutes_generator_ui::handler::drag_drop::drag_drop;
 use md_minutes_generator_ui::handler::generate::generate;
 use md_minutes_generator_ui::handler::select_input::select_input;
@@ -11,6 +11,8 @@ use thaw::*;
 
 #[component]
 pub fn App() -> impl IntoView {
+    let toaster = ToasterInjection::expect_context();
+
     let file_path = RwSignal::new(String::new());
     let markdown_path = RwSignal::new(String::new());
     let worksheet_options = RwSignal::new(Vec::new());
@@ -39,48 +41,13 @@ pub fn App() -> impl IntoView {
         }
     });
 
+    // Select output path
     let select_path = move |ev: MouseEvent| {
         ev.prevent_default();
         spawn_local(select_output(markdown_path));
     };
 
-    let is_worksheet_selected = move || {
-        if let Some(selected_worksheet) = selected_worksheet.get() {
-            let today = Local::now().format("%Y%m%d").to_string();
-            if selected_worksheet == today {
-                return view! {
-                    <MessageBar intent=MessageBarIntent::Success>
-                        <MessageBarBody>
-                            <MessageBarTitle>"Date matched"</MessageBarTitle>
-                            "Today's worksheet has been found, you can generate now."
-                        </MessageBarBody>
-                    </MessageBar>
-                };
-            }
-
-            return view! {
-                <MessageBar intent=MessageBarIntent::Warning>
-                    <MessageBarBody>
-                        <MessageBarTitle>"Date mismatched"</MessageBarTitle>
-                        "No worksheet matches today, please select one to generate."
-                    </MessageBarBody>
-                </MessageBar>
-            };
-        };
-
-        view! {
-            <MessageBar intent=MessageBarIntent::Info>
-                <MessageBarBody>
-                    <MessageBarTitle>"Excel not found"</MessageBarTitle>
-                    "No excel has been found, please select one to proceed."
-                </MessageBarBody>
-            </MessageBar>
-        }
-    };
-
     // Generate markdown
-    let toaster = ToasterInjection::expect_context();
-
     let generate_markdown = move |ev: MouseEvent| {
         ev.prevent_default();
         spawn_local(generate(
@@ -148,7 +115,7 @@ pub fn App() -> impl IntoView {
             <br/>
 
             <Flex justify=FlexJustify::Center>
-                {is_worksheet_selected}
+                <FileStatus selected_worksheet/>
             </Flex>
         </main>
     }

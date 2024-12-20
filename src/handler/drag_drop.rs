@@ -9,7 +9,7 @@ pub async fn drag_drop(file_path: RwSignal<String>) {
     let closure = Closure::<dyn FnMut(_)>::new(move |js_value: JsValue| {
         match from_value::<Object>(js_value) {
             Ok(data) => {
-                logging::log!("recv event: {:?}", data);
+                // logging::log!("recv event: {:?}", data);
                 if let Some(path) = data.payload.paths.first() {
                     file_path.set(path.to_owned());
                 }
