@@ -1,9 +1,11 @@
-use crate::handler::{invoke, FileArgs};
+use std::time::Duration;
+
 use leptos::prelude::{Get, RwSignal};
 use leptos::view;
-use std::time::Duration;
 use thaw::*;
 use wasm_bindgen::JsValue;
+
+use crate::handler::{invoke, FileArgs};
 
 pub async fn generate(
     file_path: RwSignal<String>,

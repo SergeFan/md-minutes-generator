@@ -1,7 +1,6 @@
 mod file_process;
 
 use directories::UserDirs;
-use std::convert::From;
 use tauri_plugin_dialog::DialogExt;
 
 #[tauri::command]

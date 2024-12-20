@@ -1,13 +1,14 @@
 use leptos::ev::MouseEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
+use thaw::*;
+
 use md_minutes_generator_ui::component::message_bar::FileStatus;
 use md_minutes_generator_ui::handler::drag_drop::drag_drop;
 use md_minutes_generator_ui::handler::generate::generate;
 use md_minutes_generator_ui::handler::select_input::select_input;
 use md_minutes_generator_ui::handler::select_output::select_output;
 use md_minutes_generator_ui::handler::setup_output_options;
-use thaw::*;
 
 #[component]
 pub fn App() -> impl IntoView {

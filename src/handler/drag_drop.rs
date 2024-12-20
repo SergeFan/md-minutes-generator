@@ -1,9 +1,10 @@
-use crate::handler::{listen, Object};
 use leptos::logging;
 use leptos::prelude::{RwSignal, Set};
 use serde_wasm_bindgen::from_value;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::{JsCast, JsValue};
+
+use crate::handler::{listen, Object};
 
 pub async fn drag_drop(file_path: RwSignal<String>) {
     let closure = Closure::<dyn FnMut(_)>::new(move |js_value: JsValue| {

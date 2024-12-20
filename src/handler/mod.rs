@@ -1,13 +1,13 @@
+pub mod drag_drop;
+pub mod generate;
+pub mod select_input;
+pub mod select_output;
+
 use js_sys::try_iter;
 use leptos::prelude::{GetUntracked, RwSignal, Set};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
-
-pub mod drag_drop;
-pub mod generate;
-pub mod select_input;
-pub mod select_output;
 
 #[wasm_bindgen]
 extern "C" {
