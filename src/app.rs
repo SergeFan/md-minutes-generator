@@ -1,79 +1,31 @@
-use js_sys::try_iter;
 use leptos::ev::MouseEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
-use leptos::*;
-use serde::{Deserialize, Serialize};
-use serde_wasm_bindgen::from_value;
-use std::convert::Into;
+use md_minutes_generator_ui::component::message_bar::FileStatus;
+use md_minutes_generator_ui::handler::drag_drop::drag_drop;
+use md_minutes_generator_ui::handler::generate::generate;
+use md_minutes_generator_ui::handler::select_input::select_input;
+use md_minutes_generator_ui::handler::select_output::select_output;
+use md_minutes_generator_ui::handler::setup_output_options;
 use thaw::*;
-use wasm_bindgen::prelude::*;
-
-#[wasm_bindgen]
-extern "C" {
-    // invoke without arguments
-    #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"], js_name = invoke)]
-    async fn invoke_without_args(cmd: &str) -> JsValue;
-
-    #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "core"])]
-    async fn invoke(cmd: &str, args: JsValue) -> JsValue;
-
-    // Tauri event listener
-    #[wasm_bindgen(js_namespace = ["window", "__TAURI__", "event"])]
-    async fn listen(event: &str, handler: &js_sys::Function) -> JsValue;
-}
-
-#[derive(Serialize, Deserialize)]
-struct FileArgs<'a> {
-    input: &'a str,
-    output: &'a str,
-    sheet: &'a str,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Object {
-    id: u32,
-    event: String,
-    payload: Payload,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Payload {
-    paths: Vec<String>,
-    position: Position,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Position {
-    x: u32,
-    y: u32,
-}
 
 #[component]
 pub fn App() -> impl IntoView {
+    let toaster = ToasterInjection::expect_context();
+
     let file_path = RwSignal::new(String::new());
     let markdown_path = RwSignal::new(String::new());
     let worksheet_options = RwSignal::new(Vec::new());
     let selected_worksheet = RwSignal::new(None::<String>);
 
     // Drag & drop handler
-    spawn_local(async move {
-        let closure = Closure::<dyn FnMut(_)>::new(move |js_value: JsValue| {
-            match from_value::<Object>(js_value) {
-                Ok(data) => {
-                    logging::log!("recv event: {:?}", data);
-                    if let Some(path) = data.payload.paths.first() {
-                        file_path.set(path.to_owned());
-                    }
-                }
-                Err(err) => logging::error!("error: {:?}", err),
-            }
-        });
+    spawn_local(drag_drop(file_path));
 
-        listen("tauri://drag-drop", closure.as_ref().unchecked_ref()).await;
-
-        closure.forget();
-    });
+    // File select handler
+    let select_file = move |ev: MouseEvent| {
+        ev.prevent_default();
+        spawn_local(select_input(file_path));
+    };
 
     Effect::new(move |_| {
         if !file_path.get().is_empty() {
@@ -89,74 +41,21 @@ pub fn App() -> impl IntoView {
         }
     });
 
-    // File select handler
-    let select_file = move |ev: MouseEvent| {
-        ev.prevent_default();
-        spawn_local(async move {
-            let selected_file = invoke_without_args("select_file")
-                .await
-                .as_string()
-                .unwrap();
-
-            file_path.set(selected_file.to_owned());
-        });
-    };
-
+    // Select output path
     let select_path = move |ev: MouseEvent| {
         ev.prevent_default();
-        spawn_local(async move {
-            let selected_path = invoke_without_args("select_path")
-                .await
-                .as_string()
-                .unwrap();
-
-            if !selected_path.is_empty() {
-                markdown_path.set(selected_path)
-            }
-        })
+        spawn_local(select_output(markdown_path));
     };
 
-    let toaster = ToasterInjection::expect_context();
-
+    // Generate markdown
     let generate_markdown = move |ev: MouseEvent| {
         ev.prevent_default();
-        spawn_local(async move {
-            let selected_file = file_path.get();
-            let selected_path = markdown_path.get();
-            if let Some(selected_sheet) = selected_worksheet.get() {
-                let args = serde_wasm_bindgen::to_value(&FileArgs {
-                    input: selected_file.as_str(),
-                    output: selected_path.as_str(),
-                    sheet: selected_sheet.as_str(),
-                })
-                .unwrap();
-
-                let js_value: JsValue = invoke("generate_markdown", args).await;
-
-                if js_value.as_bool().unwrap_or(false) {
-                    toaster.dispatch_toast(move || view! {
-                        <Toast>
-                            <ToastTitle>"Generation completed"</ToastTitle>
-                            <ToastBody>{format!("Markdown file has been generated at '{}'.", selected_path)}</ToastBody>
-                        </Toast>
-                    }, ToastOptions::default().with_position(ToastPosition::Top).with_intent(ToastIntent::Success));
-                } else {
-                    toaster.dispatch_toast(
-                        move || {
-                            view! {
-                                <Toast>
-                                    <ToastTitle>"Generation failed"</ToastTitle>
-                                    <ToastBody>"Markdown generation has been cancelled."</ToastBody>
-                                </Toast>
-                            }
-                        },
-                        ToastOptions::default()
-                            .with_position(ToastPosition::Top)
-                            .with_intent(ToastIntent::Error),
-                    );
-                }
-            };
-        })
+        spawn_local(generate(
+            file_path,
+            markdown_path,
+            selected_worksheet,
+            toaster,
+        ))
     };
 
     view! {
@@ -179,75 +78,45 @@ pub fn App() -> impl IntoView {
             </p>
 
             <Grid cols=5 x_gap=8 y_gap=8>
-            <GridItem offset=1 column=2>
-                <Field>
-                    <Input value=file_path placeholder="Select input excel path..."/>
-                </Field>
-            </GridItem>
-            <GridItem>
-                <Button block=true on:click=select_file appearance=ButtonAppearance::Secondary>"Input Path"</Button>
-            </GridItem>
-            <GridItem offset=1 column=2>
-                <Field>
-                    <Input value=markdown_path placeholder="Select output markdown path..."/>
-                </Field>
-            </GridItem>
-            <GridItem>
-                <Button block=true on:click=select_path appearance=ButtonAppearance::Secondary>"Output Path"</Button>
-            </GridItem>
-            <GridItem offset=1 column=2>
-                <Select>
-                    <For
-                        each=move || worksheet_options.get()
-                        key=move |worksheet_option| worksheet_option.clone()
-                        children=move |worksheet_option| {
-                            view!{
-                                <option>{worksheet_option}</option>
+                <GridItem offset=1 column=2>
+                    <Field>
+                        <Input value=file_path placeholder="Select input excel path..."/>
+                    </Field>
+                </GridItem>
+                <GridItem>
+                    <Button block=true on:click=select_file appearance=ButtonAppearance::Secondary>"Input Path"</Button>
+                </GridItem>
+                <GridItem offset=1 column=2>
+                    <Field>
+                        <Input value=markdown_path placeholder="Select output markdown path..."/>
+                    </Field>
+                </GridItem>
+                <GridItem>
+                    <Button block=true on:click=select_path appearance=ButtonAppearance::Secondary>"Output Path"</Button>
+                </GridItem>
+                <GridItem offset=1 column=2>
+                    <Select>
+                        <For
+                            each=move || worksheet_options.get()
+                            key=move |worksheet_option| worksheet_option.clone()
+                            children=move |worksheet_option| {
+                                view!{
+                                    <option>{worksheet_option}</option>
+                                }
                             }
-                        }
-                    />
-                </Select>
-            </GridItem>
-            <GridItem>
-                <Button block=true on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
-            </GridItem>
+                        />
+                    </Select>
+                </GridItem>
+                <GridItem>
+                    <Button block=true on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
+                </GridItem>
             </Grid>
+
+            <br/>
+
+            <Flex justify=FlexJustify::Center>
+                <FileStatus selected_worksheet/>
+            </Flex>
         </main>
-    }
-}
-
-async fn setup_output_options(
-    selected_file: &str,
-    markdown_path: RwSignal<String>,
-    worksheet_options: RwSignal<Vec<String>>,
-    selected_worksheet: RwSignal<Option<String>>,
-) {
-    if markdown_path.get_untracked().is_empty() {
-        markdown_path.set(
-            invoke_without_args("get_desktop_dir")
-                .await
-                .as_string()
-                .unwrap(),
-        );
-    }
-
-    let args = serde_wasm_bindgen::to_value(&FileArgs {
-        input: selected_file,
-        output: "",
-        sheet: "",
-    })
-    .unwrap();
-    let js_value: JsValue = invoke("read_excel", args).await;
-
-    if let Ok(Some(js_iterator)) = try_iter(&js_value) {
-        let options: Vec<String> = js_iterator
-            .filter_map(|item| item.ok().unwrap().as_string())
-            .collect();
-
-        if let Some(first_option) = options.first() {
-            selected_worksheet.set(Some(first_option.to_owned()));
-        }
-
-        worksheet_options.set(options);
     }
 }
