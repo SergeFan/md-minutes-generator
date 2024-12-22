@@ -1,4 +1,4 @@
-use leptos::prelude::{Get, RwSignal};
+use leptos::prelude::{GetUntracked, RwSignal};
 use thaw::*;
 use wasm_bindgen::JsValue;
 
@@ -11,10 +11,10 @@ pub async fn generate(
     selected_worksheet: RwSignal<Option<String>>,
     toaster: ToasterInjection,
 ) {
-    let selected_file = file_path.get();
-    let selected_path = markdown_path.get();
+    let selected_file = file_path.get_untracked();
+    let selected_path = markdown_path.get_untracked();
 
-    if let Some(selected_sheet) = selected_worksheet.get() {
+    if let Some(selected_sheet) = selected_worksheet.get_untracked() {
         let args = serde_wasm_bindgen::to_value(&FileArgs {
             input: selected_file.as_str(),
             output: selected_path.as_str(),
