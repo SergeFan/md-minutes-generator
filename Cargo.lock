@@ -4717,9 +4717,9 @@ dependencies = [
 
 [[package]]
 name = "thaw"
-version = "0.4.0-rc"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0908d15821c5d55b8097ca2762cc59c1264b75e0bc3195f6aae759da490557c"
+checksum = "a746d84af866f5b69d8a9d45b24707a8518ac1fc82e86855e8a24f19c4f2dd19"
 dependencies = [
  "cfg-if",
  "chrono",
@@ -4740,9 +4740,9 @@ dependencies = [
 
 [[package]]
 name = "thaw_components"
-version = "0.2.0-rc"
+version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7089dc9bebb91ab0ad4861ff73200343aa6601d950f22517804a97c59073559b"
+checksum = "64b555776479a8b7c81bb4899ee83ea68c3c2de139b561ad7cbce8e1f5616add"
 dependencies = [
  "cfg-if",
  "leptos",
@@ -4754,9 +4754,9 @@ dependencies = [
 
 [[package]]
 name = "thaw_macro"
-version = "0.1.0-rc"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c295f0980254681f8c1d7a15da34e0c5650efa4ed4d7bed0f782d7858c5031a8"
+checksum = "5af50a5123e480e7ee8961e6456f63530816875d0a19cb73060b8e61dd2a95fb"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4765,9 +4765,9 @@ dependencies = [
 
 [[package]]
 name = "thaw_utils"
-version = "0.1.0-rc"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fbd70fb14cf2339c1bc3de1c564ad0fd91750625a5a6feabbbf0acca9fd6283"
+checksum = "7c9f1d8c9f9383fbd9de9af956f7f95c8df13bf1f12571910606c50d4efaccb3"
 dependencies = [
  "cfg-if",
  "chrono",
