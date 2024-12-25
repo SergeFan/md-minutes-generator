@@ -2,18 +2,18 @@ use leptos::prelude::*;
 use leptos::{view, IntoView};
 use thaw::*;
 
-pub fn drawer(open_settings: RwSignal<bool>) -> impl IntoView {
+#[component]
+pub fn AppSetting(open_settings: RwSignal<bool>) -> impl IntoView {
     view! {
         <OverlayDrawer open=open_settings position=DrawerPosition::Left>
             <DrawerHeader>
                 <DrawerHeaderTitle>
                     <DrawerHeaderTitleAction slot>
                         <Button
+                            icon=icondata::CgClose
                             appearance=ButtonAppearance::Subtle
                             on_click=move |_| open_settings.set(false)
-                        >
-                            "x"
-                        </Button>
+                        />
                     </DrawerHeaderTitleAction>
                 "App Settings"
                 </DrawerHeaderTitle>

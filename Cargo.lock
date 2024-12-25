@@ -1809,6 +1809,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "icondata"
+version = "0.5.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "805a2a031c06a768407b774240192b0ad82ddb94554bb5b52053453f2f6b0bf1"
+dependencies = [
+ "icondata_cg",
+ "icondata_core",
+ "icondata_oc",
+]
+
+[[package]]
 name = "icondata_ai"
 version = "0.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1818,10 +1829,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "icondata_cg"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a0eba691ca17a43ffc8ebbcf200cd3ea54ad75837f210a6a6ace87a491be8314"
+dependencies = [
+ "icondata_core",
+]
+
+[[package]]
 name = "icondata_core"
 version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6c97be924215abd5e630d84e95a47c710138a6559b4c55039f4f33aa897fa859"
+
+[[package]]
+name = "icondata_oc"
+version = "0.0.10"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8be19499912a05d5db89ccb88dbe3c459ca4100bda3dbcbddff69f2dcf71d305"
+dependencies = [
+ "icondata_core",
+]
 
 [[package]]
 name = "icu_collections"
@@ -2470,6 +2499,7 @@ version = "0.2.0"
 dependencies = [
  "chrono",
  "console_error_panic_hook",
+ "icondata",
  "js-sys",
  "leptos",
  "serde",
