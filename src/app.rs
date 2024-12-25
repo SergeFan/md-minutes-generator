@@ -1,18 +1,20 @@
 use leptos::ev::MouseEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
-use thaw::*;
-
+use md_minutes_generator_ui::component::drawer::drawer;
 use md_minutes_generator_ui::component::message_bar::FileStatus;
 use md_minutes_generator_ui::handler::drag_drop::drag_drop;
 use md_minutes_generator_ui::handler::generate::generate;
 use md_minutes_generator_ui::handler::select_input::select_input;
 use md_minutes_generator_ui::handler::select_output::select_output;
 use md_minutes_generator_ui::handler::setup_output_options;
+use thaw::*;
 
 #[component]
 pub fn App() -> impl IntoView {
     let toaster = ToasterInjection::expect_context();
+
+    let open_settings = RwSignal::new(false);
 
     let file_path = RwSignal::new(String::new());
     let markdown_path = RwSignal::new(String::new());
@@ -61,7 +63,16 @@ pub fn App() -> impl IntoView {
 
     view! {
         <main class="container">
-            <h1>"Powered by Tauri + Leptos"</h1>
+            <Grid cols=7>
+                <GridItem offset=1 column=5>
+                    <h1>"Powered by Tauri + Leptos"</h1>
+                </GridItem>
+                <GridItem attr:style="display:flex align-items:center">
+                    <Button appearance=ButtonAppearance::Transparent on:click=move |_| open_settings.set(true)>"Settings"</Button>
+                </GridItem>
+            </Grid>
+
+            {drawer(open_settings)}
 
             <div class="row">
                 <a href="https://tauri.app" target="_blank">
