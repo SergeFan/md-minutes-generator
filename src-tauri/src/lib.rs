@@ -1,7 +1,13 @@
+mod command;
 mod file_process;
 
 use directories::UserDirs;
+use serde_json::json;
+use tauri::AppHandle;
 use tauri_plugin_dialog::DialogExt;
+use tauri_plugin_store::StoreBuilder;
+
+use crate::command::settings::*;
 
 #[tauri::command]
 fn get_desktop_dir() -> String {
@@ -19,7 +25,7 @@ fn get_desktop_dir() -> String {
 }
 
 #[tauri::command]
-async fn select_file(app_handle: tauri::AppHandle) -> String {
+async fn select_file(app_handle: AppHandle) -> String {
     if let Some(user_dirs) = UserDirs::new() {
         let file_path = app_handle
             .dialog()
@@ -38,7 +44,7 @@ async fn select_file(app_handle: tauri::AppHandle) -> String {
 }
 
 #[tauri::command]
-async fn select_path(app_handle: tauri::AppHandle) -> String {
+async fn select_path(app_handle: AppHandle) -> String {
     if let Some(user_dirs) = UserDirs::new() {
         let file_path = app_handle
             .dialog()
@@ -65,7 +71,7 @@ fn read_excel(input: &str, _: Option<&str>, _: Option<&str>) -> Vec<String> {
 }
 
 #[tauri::command]
-fn generate_markdown(app_handle: tauri::AppHandle, input: &str, output: &str, sheet: &str) -> bool {
+fn generate_markdown(app_handle: AppHandle, input: &str, output: &str, sheet: &str) -> bool {
     if output.is_empty() || sheet.is_empty() {
         return false;
     }
@@ -79,12 +85,24 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_store::Builder::default().build())
+        .setup(|app| {
+            StoreBuilder::new(app, "store.json")
+                .default("language", json!({"value": "en"}))
+                .default("direct_generation", json!({"value": false}))
+                .build()?;
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
+            generate_markdown,
+            get_app_settings,
             get_desktop_dir,
+            read_excel,
+            reset_app_settings,
             select_file,
             select_path,
-            read_excel,
-            generate_markdown
+            set_app_settings,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

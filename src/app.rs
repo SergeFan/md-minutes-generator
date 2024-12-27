@@ -1,3 +1,4 @@
+use chrono::Local;
 use leptos::ev::MouseEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
@@ -9,18 +10,23 @@ use md_minutes_generator_ui::handler::drag_drop::drag_drop;
 use md_minutes_generator_ui::handler::generate::generate;
 use md_minutes_generator_ui::handler::select_input::select_input;
 use md_minutes_generator_ui::handler::select_output::select_output;
-use md_minutes_generator_ui::handler::setup_output_options;
+use md_minutes_generator_ui::handler::settings::get_app_settings;
+use md_minutes_generator_ui::handler::{is_date_matched, setup_output_options};
 
 #[component]
 pub fn App() -> impl IntoView {
     let toaster = ToasterInjection::expect_context();
 
     let open_settings = RwSignal::new(false);
+    let language = RwSignal::new(String::new());
+    let direct_generation = RwSignal::new(false);
 
     let file_path = RwSignal::new(String::new());
     let markdown_path = RwSignal::new(String::new());
     let worksheet_options = RwSignal::new(Vec::new());
     let selected_worksheet = RwSignal::new(None::<String>);
+
+    spawn_local(get_app_settings(language, direct_generation));
 
     // Drag & drop handler
     spawn_local(drag_drop(file_path));
@@ -41,6 +47,17 @@ pub fn App() -> impl IntoView {
                     selected_worksheet,
                 )
                 .await;
+
+                if direct_generation.get_untracked()
+                    && is_date_matched(selected_worksheet, Local::now())
+                {
+                    spawn_local(generate(
+                        file_path,
+                        markdown_path,
+                        selected_worksheet,
+                        toaster,
+                    ));
+                }
             });
         }
     });
@@ -59,12 +76,12 @@ pub fn App() -> impl IntoView {
             markdown_path,
             selected_worksheet,
             toaster,
-        ))
+        ));
     };
 
     view! {
         <main class="container">
-            <AppSetting open_settings/>
+            <AppSetting open_settings language direct_generation/>
 
             <Flex vertical=true>
                 <Flex justify=FlexJustify::End>

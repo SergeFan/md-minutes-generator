@@ -2,7 +2,9 @@ pub mod drag_drop;
 pub mod generate;
 pub mod select_input;
 pub mod select_output;
+pub mod settings;
 
+use chrono::{DateTime, Local};
 use js_sys::try_iter;
 use leptos::prelude::{GetUntracked, RwSignal, Set};
 use serde::{Deserialize, Serialize};
@@ -47,6 +49,19 @@ struct Payload {
 struct Position {
     x: u32,
     y: u32,
+}
+
+pub fn is_date_matched(
+    selected_worksheet: RwSignal<Option<String>>,
+    date: DateTime<Local>,
+) -> bool {
+    if let Some(worksheet_name) = selected_worksheet.get_untracked() {
+        if worksheet_name == date.format("%Y%m%d").to_string() {
+            return true;
+        }
+    }
+
+    false
 }
 
 pub async fn setup_output_options(

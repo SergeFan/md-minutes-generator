@@ -1,9 +1,32 @@
+use leptos::ev::MouseEvent;
+use leptos::leptos_dom::logging::console_log;
 use leptos::prelude::*;
+use leptos::task::spawn_local;
 use leptos::{view, IntoView};
 use thaw::*;
 
+use crate::handler::settings::{reset_app_settings, set_app_settings};
+
 #[component]
-pub fn AppSetting(open_settings: RwSignal<bool>) -> impl IntoView {
+pub fn AppSetting(
+    open_settings: RwSignal<bool>,
+    language: RwSignal<String>,
+    direct_generation: RwSignal<bool>,
+) -> impl IntoView {
+    let reset_settings = move |ev: MouseEvent| {
+        ev.prevent_default();
+        spawn_local(reset_app_settings(language, direct_generation));
+    };
+
+    let save_settings = move |ev: MouseEvent| {
+        ev.prevent_default();
+
+        // TODO: delete console log after feature finished
+        console_log(language.get_untracked().as_str());
+
+        spawn_local(set_app_settings(language, direct_generation));
+    };
+
     view! {
         <OverlayDrawer open=open_settings position=DrawerPosition::Left>
             <DrawerHeader>
@@ -21,15 +44,15 @@ pub fn AppSetting(open_settings: RwSignal<bool>) -> impl IntoView {
             <DrawerBody>
                 <Flex vertical=true>
                     <p><b>"Language"</b></p>
-                    <Select>
-                        <option>"English"</option>
-                        <option>"日本語"</option>
-                        <option>"简体中文"</option>
-                    </Select>
+                    <Combobox value=language>
+                        <ComboboxOption value="en" text="English"/>
+                        <ComboboxOption value="jp" text="日本語"/>
+                        <ComboboxOption value="sc" text="简体中文"/>
+                    </Combobox>
                 </Flex>
                 <Flex vertical=true>
                     <p><b>"Direct Generation"</b></p>
-                    <Switch/>
+                    <Switch checked=direct_generation/>
                     <p>
                         <b>"Note: "</b>
                         "Turn on Direct Generation will generate markdown at selected output path "
@@ -37,8 +60,9 @@ pub fn AppSetting(open_settings: RwSignal<bool>) -> impl IntoView {
                         "when worksheet with name matching today's date has been found."
                     </p>
                 </Flex>
-                <Flex justify=FlexJustify::End>
-                    <Button>"Save"</Button>
+                <Flex justify=FlexJustify::SpaceBetween>
+                    <Button on:click=reset_settings>"Reset"</Button>
+                    <Button on:click=save_settings appearance=ButtonAppearance::Primary>"Save"</Button>
                 </Flex>
             </DrawerBody>
         </OverlayDrawer>
