@@ -18,6 +18,8 @@ pub async fn get_app_settings(language: RwSignal<String>, direct_generation: RwS
 
     language.set(settings.language);
     direct_generation.set(settings.direct_generation);
+
+    console_log(format!("language is set to: {}", language.get_untracked()).as_str());
 }
 
 pub async fn reset_app_settings(language: RwSignal<String>, direct_generation: RwSignal<bool>) {
