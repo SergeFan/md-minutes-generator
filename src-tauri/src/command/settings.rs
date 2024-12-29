@@ -27,22 +27,8 @@ pub fn get_app_settings(app_handle: AppHandle) -> AppSettings {
 }
 
 #[tauri::command]
-pub fn reset_app_settings(app_handle: AppHandle) -> AppSettings {
-    let store = app_handle.store("store.json").unwrap();
-
-    store.reset();
-
-    let language = store
-        .get("language")
-        .expect("No language setting is found.");
-    let direct_generation = store
-        .get("direct_generation")
-        .expect("No direct generation setting is found.");
-
-    AppSettings {
-        language: language.get("value").unwrap().to_string(),
-        direct_generation: direct_generation.get("value").unwrap().as_bool().unwrap(),
-    }
+pub fn reset_app_settings(app_handle: AppHandle) {
+    app_handle.store("store.json").unwrap().reset();
 }
 
 #[tauri::command]

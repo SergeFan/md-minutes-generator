@@ -1,5 +1,4 @@
 use leptos::ev::MouseEvent;
-use leptos::leptos_dom::logging::console_log;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::{view, IntoView};
@@ -13,8 +12,6 @@ pub fn AppSetting(
     language: RwSignal<String>,
     direct_generation: RwSignal<bool>,
 ) -> impl IntoView {
-    console_log(format!("language is set to: {}", language.get_untracked()).as_str());
-
     let reset_settings = move |ev: MouseEvent| {
         ev.prevent_default();
         spawn_local(reset_app_settings(language, direct_generation));
@@ -22,14 +19,8 @@ pub fn AppSetting(
 
     let save_settings = move |ev: MouseEvent| {
         ev.prevent_default();
-
-        // TODO: delete console log after feature finished
-        console_log(language.get_untracked().as_str());
-
         spawn_local(set_app_settings(language, direct_generation));
     };
-
-    // let test_language = RwSignal::new(String::from("sc"));
 
     view! {
         <OverlayDrawer open=open_settings position=DrawerPosition::Left>
@@ -48,17 +39,11 @@ pub fn AppSetting(
             <DrawerBody>
                 <Flex vertical=true>
                     <p><b>"Language"</b></p>
-                    <Combobox value=language>
-                        <ComboboxOption value="en" text="English"/>
-                        <ComboboxOption value="jp" text="日本語"/>
-                        <ComboboxOption value="sc" text="简体中文"/>
-                    </Combobox>
-                    // <Select value=test_language>
-                    //     <option value="en">"English"</option>
-                    //     <option value="jp">"日本語"</option>
-                    //     <option value="sc">"简体中文"</option>
-                    // </Select>
-                    // <Button on:click=move |_| test_language.set("jp".to_string())>"test"</Button>
+                    <Select value=language default_value=language.get_untracked()>
+                        <option value="en">"English"</option>
+                        <option value="jp">"日本語"</option>
+                        <option value="sc">"简体中文"</option>
+                    </Select>
                 </Flex>
                 <Flex vertical=true>
                     <p><b>"Direct Generation"</b></p>

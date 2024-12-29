@@ -24,13 +24,6 @@ extern "C" {
     async fn listen(event: &str, handler: &js_sys::Function) -> JsValue;
 }
 
-#[derive(Serialize, Deserialize)]
-struct GenerationOptions {
-    input: String,
-    output: Option<String>,
-    sheet: Option<String>,
-}
-
 #[derive(PartialEq)]
 pub enum MatchResult {
     Match,
@@ -53,6 +46,13 @@ pub fn match_worksheet_name(
     }
 
     MatchResult::Mismatch
+}
+
+#[derive(Serialize, Deserialize)]
+struct GenerationOptions {
+    input: String,
+    output: Option<String>,
+    sheet: Option<String>,
 }
 
 pub async fn load_output_options(
