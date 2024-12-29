@@ -3,12 +3,17 @@ use tauri::AppHandle;
 use crate::tool::excel;
 
 #[tauri::command]
-pub fn generate_markdown(app_handle: AppHandle, input: &str, output: &str, sheet: &str) -> bool {
-    if output.is_empty() || sheet.is_empty() {
+pub fn generate_markdown(
+    app_handle: AppHandle,
+    input: &str,
+    output: Option<&str>,
+    sheet: Option<&str>,
+) -> bool {
+    if output.is_none() || sheet.is_none() {
         return false;
     }
 
-    excel::generate_markdown(app_handle, input, output, sheet).is_ok()
+    excel::generate_markdown(app_handle, input, output.unwrap(), sheet.unwrap()).is_ok()
 }
 
 #[tauri::command]

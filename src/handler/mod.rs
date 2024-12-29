@@ -25,10 +25,10 @@ extern "C" {
 }
 
 #[derive(Serialize, Deserialize)]
-struct FileArgs<'a> {
-    input: &'a str,
-    output: &'a str,
-    sheet: &'a str,
+struct GenerationOptions {
+    input: String,
+    output: Option<String>,
+    sheet: Option<String>,
 }
 
 #[derive(PartialEq)]
@@ -38,26 +38,28 @@ pub enum MatchResult {
     WorksheetNotFound,
 }
 
-pub fn match_worksheet(
-    selected_worksheet: RwSignal<Option<String>>,
+pub fn match_worksheet_name(
+    selected_worksheet: RwSignal<String>,
     date: DateTime<Local>,
 ) -> MatchResult {
-    if let Some(worksheet_name) = selected_worksheet.get() {
-        if worksheet_name == date.format("%Y%m%d").to_string() {
-            return MatchResult::Match;
-        }
+    let selected_worksheet = selected_worksheet.get();
 
-        return MatchResult::Mismatch;
+    if selected_worksheet.is_empty() {
+        return MatchResult::WorksheetNotFound;
     }
 
-    MatchResult::WorksheetNotFound
+    if selected_worksheet == date.format("%Y%m%d").to_string() {
+        return MatchResult::Match;
+    }
+
+    MatchResult::Mismatch
 }
 
-pub async fn setup_output_options(
-    selected_file: &str,
+pub async fn load_output_options(
+    selected_file: RwSignal<String>,
     markdown_path: RwSignal<String>,
     worksheet_options: RwSignal<Vec<String>>,
-    selected_worksheet: RwSignal<Option<String>>,
+    selected_worksheet: RwSignal<String>,
 ) {
     if markdown_path.get_untracked().is_empty() {
         markdown_path.set(
@@ -68,10 +70,10 @@ pub async fn setup_output_options(
         );
     }
 
-    let args = serde_wasm_bindgen::to_value(&FileArgs {
-        input: selected_file,
-        output: "",
-        sheet: "",
+    let args = serde_wasm_bindgen::to_value(&GenerationOptions {
+        input: selected_file.get_untracked(),
+        output: None,
+        sheet: None,
     })
     .unwrap();
     let js_value: JsValue = invoke("read_excel", args).await;
@@ -82,7 +84,7 @@ pub async fn setup_output_options(
             .collect();
 
         if let Some(first_option) = options.first() {
-            selected_worksheet.set(Some(first_option.to_owned()));
+            selected_worksheet.set(first_option.to_owned());
         }
 
         worksheet_options.set(options);

@@ -4,10 +4,10 @@ use leptos::prelude::{Effect, RwSignal, Set};
 use leptos::{component, view, IntoView};
 use thaw::{MessageBar, MessageBarBody, MessageBarIntent, MessageBarTitle};
 
-use crate::handler::{match_worksheet, MatchResult};
+use crate::handler::{match_worksheet_name, MatchResult};
 
 #[component]
-pub fn FileStatus(selected_worksheet: RwSignal<Option<String>>) -> impl IntoView {
+pub fn FileStatus(selected_worksheet: RwSignal<String>) -> impl IntoView {
     let message_intent = RwSignal::new(MessageBarIntent::Info);
     let message_title = RwSignal::new(String::from("Excel not found"));
     let message_body = RwSignal::new(String::from(
@@ -15,7 +15,7 @@ pub fn FileStatus(selected_worksheet: RwSignal<Option<String>>) -> impl IntoView
     ));
 
     Effect::new(
-        move || match match_worksheet(selected_worksheet, Local::now()) {
+        move || match match_worksheet_name(selected_worksheet, Local::now()) {
             MatchResult::Match => {
                 message_intent.set(MessageBarIntent::Success);
                 message_title.set(String::from("Date matched"));

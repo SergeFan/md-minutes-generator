@@ -10,10 +10,10 @@ use thaw::*;
 use crate::component::drawer::AppSetting;
 use crate::component::message_bar::FileStatus;
 use crate::handler::drag_drop::drag_drop;
-use crate::handler::generate::generate;
+use crate::handler::generate::generate_markdown;
 use crate::handler::path::{select_input, select_output};
 use crate::handler::settings::get_app_settings;
-use crate::handler::{match_worksheet, setup_output_options, MatchResult};
+use crate::handler::{load_output_options, match_worksheet_name, MatchResult};
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -26,7 +26,7 @@ pub fn App() -> impl IntoView {
     let file_path = RwSignal::new(String::new());
     let markdown_path = RwSignal::new(String::new());
     let worksheet_options = RwSignal::new(Vec::new());
-    let selected_worksheet = RwSignal::new(None::<String>);
+    let selected_worksheet = RwSignal::new(String::new());
 
     spawn_local(get_app_settings(language, direct_generation));
 
@@ -42,8 +42,8 @@ pub fn App() -> impl IntoView {
     Effect::new(move |_| {
         if !file_path.get().is_empty() {
             spawn_local(async move {
-                setup_output_options(
-                    &file_path.get_untracked(),
+                load_output_options(
+                    file_path,
                     markdown_path,
                     worksheet_options,
                     selected_worksheet,
@@ -51,9 +51,9 @@ pub fn App() -> impl IntoView {
                 .await;
 
                 if direct_generation.get_untracked()
-                    && match_worksheet(selected_worksheet, Local::now()) == MatchResult::Match
+                    && match_worksheet_name(selected_worksheet, Local::now()) == MatchResult::Match
                 {
-                    spawn_local(generate(
+                    spawn_local(generate_markdown(
                         file_path,
                         markdown_path,
                         selected_worksheet,
@@ -73,7 +73,7 @@ pub fn App() -> impl IntoView {
     // Generate markdown
     let generate_markdown = move |ev: MouseEvent| {
         ev.prevent_default();
-        spawn_local(generate(
+        spawn_local(generate_markdown(
             file_path,
             markdown_path,
             selected_worksheet,
@@ -127,17 +127,17 @@ pub fn App() -> impl IntoView {
                     <Button attr:style="width: 150px" on:click=select_path appearance=ButtonAppearance::Secondary>"Output Path"</Button>
                 </Flex>
                 <Flex justify=FlexJustify::Center>
-                    <Select attr:style="width: 300px">
+                    <Combobox attr:style="width: 300px" value=selected_worksheet placeholder="Select target worksheet...">
                         <For
                             each=move || worksheet_options.get()
                             key=move |worksheet_option| worksheet_option.clone()
                             children=move |worksheet_option| {
                                 view!{
-                                    <option>{worksheet_option}</option>
+                                    <ComboboxOption text={worksheet_option}/>
                                 }
                             }
                         />
-                    </Select>
+                    </Combobox>
                     <Button attr:style="width: 150px" on:click=generate_markdown appearance=ButtonAppearance::Primary>"Generate!"</Button>
                 </Flex>
             </Flex>
