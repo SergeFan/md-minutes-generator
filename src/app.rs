@@ -1,17 +1,19 @@
+mod component;
+mod handler;
+
 use chrono::Local;
 use leptos::ev::MouseEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use thaw::*;
 
-use md_minutes_generator_ui::component::drawer::AppSetting;
-use md_minutes_generator_ui::component::message_bar::FileStatus;
-use md_minutes_generator_ui::handler::drag_drop::drag_drop;
-use md_minutes_generator_ui::handler::generate::generate;
-use md_minutes_generator_ui::handler::select_input::select_input;
-use md_minutes_generator_ui::handler::select_output::select_output;
-use md_minutes_generator_ui::handler::settings::get_app_settings;
-use md_minutes_generator_ui::handler::{is_date_matched, setup_output_options};
+use crate::component::drawer::AppSetting;
+use crate::component::message_bar::FileStatus;
+use crate::handler::drag_drop::drag_drop;
+use crate::handler::generate::generate;
+use crate::handler::path::{select_input, select_output};
+use crate::handler::settings::get_app_settings;
+use crate::handler::{match_worksheet, setup_output_options, MatchResult};
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -49,7 +51,7 @@ pub fn App() -> impl IntoView {
                 .await;
 
                 if direct_generation.get_untracked()
-                    && is_date_matched(selected_worksheet, Local::now())
+                    && match_worksheet(selected_worksheet, Local::now()) == MatchResult::Match
                 {
                     spawn_local(generate(
                         file_path,

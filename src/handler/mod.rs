@@ -1,12 +1,11 @@
 pub mod drag_drop;
 pub mod generate;
-pub mod select_input;
-pub mod select_output;
+pub mod path;
 pub mod settings;
 
 use chrono::{DateTime, Local};
 use js_sys::try_iter;
-use leptos::prelude::{GetUntracked, RwSignal, Set};
+use leptos::prelude::{Get, GetUntracked, RwSignal, Set};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
@@ -32,36 +31,26 @@ struct FileArgs<'a> {
     sheet: &'a str,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Object {
-    id: u32,
-    event: String,
-    payload: Payload,
+#[derive(PartialEq)]
+pub enum MatchResult {
+    Match,
+    Mismatch,
+    WorksheetNotFound,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Payload {
-    paths: Vec<String>,
-    position: Position,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Position {
-    x: u32,
-    y: u32,
-}
-
-pub fn is_date_matched(
+pub fn match_worksheet(
     selected_worksheet: RwSignal<Option<String>>,
     date: DateTime<Local>,
-) -> bool {
-    if let Some(worksheet_name) = selected_worksheet.get_untracked() {
+) -> MatchResult {
+    if let Some(worksheet_name) = selected_worksheet.get() {
         if worksheet_name == date.format("%Y%m%d").to_string() {
-            return true;
+            return MatchResult::Match;
         }
+
+        return MatchResult::Mismatch;
     }
 
-    false
+    MatchResult::WorksheetNotFound
 }
 
 pub async fn setup_output_options(
