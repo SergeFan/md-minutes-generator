@@ -1,7 +1,7 @@
 [package]
 name = "md-minutes-generator"
-version = "0.5.1"
-description = "A Tauri App"
+version = "0.6.0"
+description = "Generate markdown meeting minutes from Excel"
 authors = ["Jaeson Fan - sergefan@live.com"]
 edition = "2021"
 
@@ -26,4 +26,6 @@ serde_json = "1.0"
 tauri = { version = "2.1", features = [] }
 tauri-plugin-dialog = "2.2"
 tauri-plugin-fs = "2.2"
+tauri-plugin-process = "2.2"
 tauri-plugin-shell = "2.2"
+tauri-plugin-store = "2.2"

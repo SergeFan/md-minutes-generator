@@ -1,10 +1,11 @@
 pub mod drag_drop;
 pub mod generate;
-pub mod select_input;
-pub mod select_output;
+pub mod path;
+pub mod settings;
 
+use chrono::{DateTime, Local};
 use js_sys::try_iter;
-use leptos::prelude::{GetUntracked, RwSignal, Set};
+use leptos::prelude::{Get, GetUntracked, RwSignal, Set};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
@@ -23,37 +24,42 @@ extern "C" {
     async fn listen(event: &str, handler: &js_sys::Function) -> JsValue;
 }
 
+#[derive(PartialEq)]
+pub enum MatchResult {
+    Match,
+    Mismatch,
+    WorksheetNotFound,
+}
+
+pub fn match_worksheet_name(
+    selected_worksheet: RwSignal<String>,
+    date: DateTime<Local>,
+) -> MatchResult {
+    let selected_worksheet = selected_worksheet.get();
+
+    if selected_worksheet.is_empty() {
+        return MatchResult::WorksheetNotFound;
+    }
+
+    if selected_worksheet == date.format("%Y%m%d").to_string() {
+        return MatchResult::Match;
+    }
+
+    MatchResult::Mismatch
+}
+
 #[derive(Serialize, Deserialize)]
-struct FileArgs<'a> {
-    input: &'a str,
-    output: &'a str,
-    sheet: &'a str,
+struct GenerationOptions {
+    input: String,
+    output: Option<String>,
+    sheet: Option<String>,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-struct Object {
-    id: u32,
-    event: String,
-    payload: Payload,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Payload {
-    paths: Vec<String>,
-    position: Position,
-}
-
-#[derive(Debug, Serialize, Deserialize)]
-struct Position {
-    x: u32,
-    y: u32,
-}
-
-pub async fn setup_output_options(
-    selected_file: &str,
+pub async fn load_output_options(
+    selected_file: RwSignal<String>,
     markdown_path: RwSignal<String>,
     worksheet_options: RwSignal<Vec<String>>,
-    selected_worksheet: RwSignal<Option<String>>,
+    selected_worksheet: RwSignal<String>,
 ) {
     if markdown_path.get_untracked().is_empty() {
         markdown_path.set(
@@ -64,10 +70,10 @@ pub async fn setup_output_options(
         );
     }
 
-    let args = serde_wasm_bindgen::to_value(&FileArgs {
-        input: selected_file,
-        output: "",
-        sheet: "",
+    let args = serde_wasm_bindgen::to_value(&GenerationOptions {
+        input: selected_file.get_untracked(),
+        output: None,
+        sheet: None,
     })
     .unwrap();
     let js_value: JsValue = invoke("read_excel", args).await;
@@ -78,7 +84,7 @@ pub async fn setup_output_options(
             .collect();
 
         if let Some(first_option) = options.first() {
-            selected_worksheet.set(Some(first_option.to_owned()));
+            selected_worksheet.set(first_option.to_owned());
         }
 
         worksheet_options.set(options);

@@ -5,6 +5,7 @@ use std::path::Path;
 
 use anyhow::{anyhow, Context};
 use calamine::{open_workbook, RangeDeserializerBuilder, Reader, Xlsx};
+use tauri::AppHandle;
 use tauri_plugin_fs::{FsExt, OpenOptions};
 
 pub fn read_excel(input_path: &str) -> anyhow::Result<Vec<String>> {
@@ -27,7 +28,7 @@ pub fn read_excel(input_path: &str) -> anyhow::Result<Vec<String>> {
 }
 
 pub fn generate_markdown(
-    app_handle: tauri::AppHandle,
+    app_handle: AppHandle,
     input_path: &str,
     output_path: &str,
     sheet_name: &str,
