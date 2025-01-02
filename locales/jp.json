@@ -23,5 +23,9 @@
   "toast_title_success": "生成完了",
   "toast_body_success": "Markdownの生成は成功しました。",
   "toast_title_error": "生成失敗",
-  "toast_body_error": "Markdownの生成は取り消されました。"
+  "toast_body_error": "Markdownの生成は取り消されました。",
+  "dialog_title": "注意",
+  "dialog_body": "設定を反映するためにマニュアルの再起動が必要です。よろしいでしょうか？",
+  "dialog_button_confirm": "はい",
+  "dialog_button_cancel": "いいえ"
 }

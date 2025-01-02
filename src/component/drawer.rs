@@ -5,8 +5,16 @@ use leptos::{view, IntoView};
 use leptos_i18n::t;
 use thaw::*;
 
+use crate::component::dialog::ApplySettingDialog;
 use crate::handler::settings::{reset_app_settings, set_app_settings};
 use crate::i18n::use_i18n;
+
+#[derive(Clone)]
+enum SavePattern {
+    Save,
+    Reset,
+    Cancel,
+}
 
 #[component]
 pub fn AppSetting(
@@ -16,15 +24,31 @@ pub fn AppSetting(
 ) -> impl IntoView {
     let i18n = use_i18n();
 
+    let open_dialog = RwSignal::new(false);
+    let save_pattern = RwSignal::new(SavePattern::Cancel);
+    let save_action = RwSignal::new(false);
+
     let reset_settings = move |ev: MouseEvent| {
         ev.prevent_default();
-        spawn_local(reset_app_settings(language, direct_generation));
+        open_dialog.set(true);
+        save_pattern.set(SavePattern::Reset);
     };
 
     let save_settings = move |ev: MouseEvent| {
         ev.prevent_default();
-        spawn_local(set_app_settings(language, direct_generation));
+        open_dialog.set(true);
+        save_pattern.set(SavePattern::Save);
     };
+
+    Effect::new(move || {
+        if save_action.get() {
+            match save_pattern.get() {
+                SavePattern::Save => spawn_local(set_app_settings(language, direct_generation)),
+                SavePattern::Reset => spawn_local(reset_app_settings(language, direct_generation)),
+                SavePattern::Cancel => {}
+            }
+        }
+    });
 
     view! {
         <OverlayDrawer open=open_settings position=DrawerPosition::Left>
@@ -62,5 +86,7 @@ pub fn AppSetting(
                 </Flex>
             </DrawerBody>
         </OverlayDrawer>
+
+        <ApplySettingDialog open=open_dialog action=save_action/>
     }
 }
