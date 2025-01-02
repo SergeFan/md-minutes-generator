@@ -1,9 +1,16 @@
 use std::time::Duration;
 
 use leptos::view;
+use leptos_i18n::{t, I18nContext};
 use thaw::*;
 
-pub fn dispatch_toast(toaster: ToasterInjection, toast_intent: ToastIntent) {
+use crate::i18n::Locale;
+
+pub fn dispatch_toast(
+    i18n: I18nContext<Locale>,
+    toaster: ToasterInjection,
+    toast_intent: ToastIntent,
+) {
     let toast_option = ToastOptions::default()
         .with_intent(toast_intent)
         .with_position(ToastPosition::Top)
@@ -15,8 +22,8 @@ pub fn dispatch_toast(toaster: ToasterInjection, toast_intent: ToastIntent) {
                 move || {
                     view! {
                         <Toast>
-                            <ToastTitle>"Completed!"</ToastTitle>
-                            <ToastBody>"Markdown generation succeeded."</ToastBody>
+                            <ToastTitle>{t!(i18n, toast_title_success)}</ToastTitle>
+                            <ToastBody>{t!(i18n, toast_body_success)}</ToastBody>
                         </Toast>
                     }
                 },
@@ -28,8 +35,8 @@ pub fn dispatch_toast(toaster: ToasterInjection, toast_intent: ToastIntent) {
                 move || {
                     view! {
                         <Toast>
-                            <ToastTitle>"Failed!"</ToastTitle>
-                            <ToastBody>"Markdown generation has been cancelled."</ToastBody>
+                            <ToastTitle>{t!(i18n, toast_title_error)}</ToastTitle>
+                            <ToastBody>{t!(i18n, toast_body_error)}</ToastBody>
                         </Toast>
                     }
                 },

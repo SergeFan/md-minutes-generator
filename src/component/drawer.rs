@@ -2,9 +2,11 @@ use leptos::ev::MouseEvent;
 use leptos::prelude::*;
 use leptos::task::spawn_local;
 use leptos::{view, IntoView};
+use leptos_i18n::t;
 use thaw::*;
 
 use crate::handler::settings::{reset_app_settings, set_app_settings};
+use crate::i18n::use_i18n;
 
 #[component]
 pub fn AppSetting(
@@ -12,6 +14,8 @@ pub fn AppSetting(
     language: RwSignal<String>,
     direct_generation: RwSignal<bool>,
 ) -> impl IntoView {
+    let i18n = use_i18n();
+
     let reset_settings = move |ev: MouseEvent| {
         ev.prevent_default();
         spawn_local(reset_app_settings(language, direct_generation));
@@ -33,12 +37,12 @@ pub fn AppSetting(
                             on_click=move |_| open_settings.set(false)
                         />
                     </DrawerHeaderTitleAction>
-                "App Settings"
+                    {t!(i18n, app_setting_title)}
                 </DrawerHeaderTitle>
             </DrawerHeader>
             <DrawerBody>
                 <Flex vertical=true>
-                    <p><b>"Language"</b></p>
+                    <p><b>{t!(i18n, app_setting_language)}</b></p>
                     <Select value=language default_value=language.get_untracked()>
                         <option value="en">"English"</option>
                         <option value="jp">"日本語"</option>
@@ -46,18 +50,15 @@ pub fn AppSetting(
                     </Select>
                 </Flex>
                 <Flex vertical=true>
-                    <p><b>"Direct Generation"</b></p>
+                    <p><b>{t!(i18n, app_setting_direct_generation)}</b></p>
                     <Switch checked=direct_generation/>
                     <p>
-                        <b>"Note: "</b>
-                        "Turn on Direct Generation will generate markdown at selected output path "
-                        <b>"instantly "</b>
-                        "when worksheet with name matching today's date has been found."
+                        {t!(i18n, app_setting_note, <b> = <b/>)}
                     </p>
                 </Flex>
                 <Flex justify=FlexJustify::SpaceBetween>
-                    <Button on:click=reset_settings>"Reset"</Button>
-                    <Button on:click=save_settings appearance=ButtonAppearance::Primary>"Save"</Button>
+                    <Button on:click=reset_settings>{t!(i18n, app_setting_reset_button)}</Button>
+                    <Button on:click=save_settings appearance=ButtonAppearance::Primary>{t!(i18n, app_setting_save_button)}</Button>
                 </Flex>
             </DrawerBody>
         </OverlayDrawer>

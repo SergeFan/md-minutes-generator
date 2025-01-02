@@ -1,3 +1,8 @@
+# v0.6.0
+ - Add App Settings
+ - Add EN, JP, CN language support
+ - UI adjustment
+
 # v0.5.1
  - Add pipeline for package release
  - Minor UI adjustment
