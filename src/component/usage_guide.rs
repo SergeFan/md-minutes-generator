@@ -10,8 +10,7 @@ pub fn UsageGuide() -> impl IntoView {
 
     view! {
         <p>
-            {t!(i18n, usage_guide_1, <b> = <b />)}<br />
-            {t!(i18n, or)}<br />
+            {t!(i18n, usage_guide_1, <b> = <b />)}<br /> {t!(i18n, or)}<br />
             {t!(i18n, usage_guide_2, <b> = <b />)}
         </p>
     }

@@ -66,7 +66,9 @@ pub fn AppSetting(
             </DrawerHeader>
             <DrawerBody>
                 <Flex vertical=true>
-                    <p><b>{t!(i18n, app_setting_language)}</b></p>
+                    <p>
+                        <b>{t!(i18n, app_setting_language)}</b>
+                    </p>
                     <Select value=language default_value=language.get_untracked()>
                         <option value="en">"English"</option>
                         <option value="jp">"日本語"</option>
@@ -74,15 +76,17 @@ pub fn AppSetting(
                     </Select>
                 </Flex>
                 <Flex vertical=true>
-                    <p><b>{t!(i18n, app_setting_direct_generation)}</b></p>
-                    <Switch checked=direct_generation />
                     <p>
-                        {t!(i18n, app_setting_note, <b> = <b />)}
+                        <b>{t!(i18n, app_setting_direct_generation)}</b>
                     </p>
+                    <Switch checked=direct_generation />
+                    <p>{t!(i18n, app_setting_note, <b> = <b />)}</p>
                 </Flex>
                 <Flex justify=FlexJustify::SpaceBetween>
                     <Button on:click=reset_settings>{t!(i18n, app_setting_reset_button)}</Button>
-                    <Button on:click=save_settings appearance=ButtonAppearance::Primary>{t!(i18n, app_setting_save_button)}</Button>
+                    <Button on:click=save_settings appearance=ButtonAppearance::Primary>
+                        {t!(i18n, app_setting_save_button)}
+                    </Button>
                 </Flex>
             </DrawerBody>
         </OverlayDrawer>

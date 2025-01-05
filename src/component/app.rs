@@ -67,29 +67,38 @@ pub fn App() -> impl IntoView {
             <Logo />
 
             <Suspense>
-                {move || {settings.read().as_deref().map(|settings| {
-                    match settings.language.as_str() {
-                        "en" => i18n.set_locale(Locale::en),
-                        "jp" => i18n.set_locale(Locale::jp),
-                        "sc" => i18n.set_locale(Locale::sc),
-                        _ => i18n.set_locale(Locale::en),
-                    };
+                {move || {
+                    settings
+                        .read()
+                        .as_deref()
+                        .map(|settings| {
+                            match settings.language.as_str() {
+                                "en" => i18n.set_locale(Locale::en),
+                                "jp" => i18n.set_locale(Locale::jp),
+                                "sc" => i18n.set_locale(Locale::sc),
+                                _ => i18n.set_locale(Locale::en),
+                            };
+                            language.set(settings.language.to_owned());
+                            direct_generation.set(settings.direct_generation);
 
-                    language.set(settings.language.to_owned());
-                    direct_generation.set(settings.direct_generation);
+                            view! {
+                                <AppSetting open_settings language direct_generation />
 
-                    view! {
-                        <AppSetting open_settings language direct_generation />
+                                <UsageGuide />
 
-                        <UsageGuide />
+                                <InputSection
+                                    file_path
+                                    markdown_path
+                                    selected_worksheet
+                                    worksheet_options
+                                />
 
-                        <InputSection file_path markdown_path selected_worksheet worksheet_options />
+                                <br />
 
-                        <br />
-
-                        <InputStatus selected_worksheet />
-                    }
-                })}}
+                                <InputStatus selected_worksheet />
+                            }
+                        })
+                }}
             </Suspense>
         </main>
     }

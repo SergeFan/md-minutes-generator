@@ -21,13 +21,15 @@ pub fn ApplySettingDialog(open: RwSignal<bool>, action: RwSignal<bool>) -> impl 
             <DialogSurface>
                 <DialogBody>
                     <DialogTitle>{t!(i18n, dialog_title)}</DialogTitle>
-                    <DialogContent>
-                        {t!(i18n, dialog_body)}
-                    </DialogContent>
+                    <DialogContent>{t!(i18n, dialog_body)}</DialogContent>
                     <DialogActions>
                         <Flex justify=FlexJustify::SpaceBetween>
-                            <Button on:click=move |_| open.set(false)>{t!(i18n, dialog_button_cancel)}</Button>
-                            <Button on:click=apply_settings appearance=ButtonAppearance::Primary>{t!(i18n, dialog_button_confirm)}</Button>
+                            <Button on:click=move |_| {
+                                open.set(false)
+                            }>{t!(i18n, dialog_button_cancel)}</Button>
+                            <Button on:click=apply_settings appearance=ButtonAppearance::Primary>
+                                {t!(i18n, dialog_button_confirm)}
+                            </Button>
                         </Flex>
                     </DialogActions>
                 </DialogBody>

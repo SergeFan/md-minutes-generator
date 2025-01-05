@@ -1,4 +1,4 @@
-use leptos::prelude::*;
+use leptos::prelude::{ElementChild, RwSignal, Set};
 use leptos::{component, view, IntoView};
 use thaw::*;
 

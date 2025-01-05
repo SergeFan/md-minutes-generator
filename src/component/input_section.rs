@@ -49,30 +49,61 @@ pub fn InputSection(
                 <Field attr:style="width: 300px">
                     <Input value=file_path placeholder=t_string!(i18n, input_path_placeholder) />
                 </Field>
-                <Button attr:style="width: 150px" on:click=select_file appearance=ButtonAppearance::Secondary>{t!(i18n, input_path_button)}</Button>
+                <Button
+                    attr:style="width: 150px"
+                    on:click=select_file
+                    appearance=ButtonAppearance::Secondary
+                >
+                    {t!(i18n, input_path_button)}
+                </Button>
             </Flex>
             <Flex justify=FlexJustify::Center>
                 <Field attr:style="width: 300px">
-                    <Input value=markdown_path placeholder=t_string!(i18n, output_path_placeholder) />
+                    <Input
+                        value=markdown_path
+                        placeholder=t_string!(i18n, output_path_placeholder)
+                    />
                 </Field>
-                <Button attr:style="width: 150px" on:click=select_path appearance=ButtonAppearance::Secondary>{t!(i18n, output_path_button)}</Button>
+                <Button
+                    attr:style="width: 150px"
+                    on:click=select_path
+                    appearance=ButtonAppearance::Secondary
+                >
+                    {t!(i18n, output_path_button)}
+                </Button>
             </Flex>
             <Flex justify=FlexJustify::Center>
-                <Combobox attr:style="width: 300px" value=selected_worksheet placeholder=t_string!(i18n, target_worksheet_placeholder)>
-                    {worksheet_options.get().iter().map(|option| view! {<ComboboxOption text=option />}).collect_view()}
+                <Combobox
+                    attr:style="width: 300px"
+                    value=selected_worksheet
+                    placeholder=t_string!(i18n, target_worksheet_placeholder)
+                >
+                    {worksheet_options
+                        .get()
+                        .iter()
+                        .map(|option| view! { <ComboboxOption text=option /> })
+                        .collect_view()}
                 </Combobox>
-                // <Select attr:style="width: 300px" value=selected_worksheet default_value=selected_worksheet.get_untracked()>
+                // <Select
+                //     attr:style="width: 300px"
+                //     value=selected_worksheet
+                //     default_value=selected_worksheet.get_untracked()
+                // >
                 //     <For
                 //         each=move || worksheet_options.get()
                 //         key=move |worksheet_option| worksheet_option.clone()
                 //         children=move |worksheet_option| {
-                //             view!{
-                //                 <option>{worksheet_option}</option>
-                //             }
+                //             view! { <option>{worksheet_option}</option> }
                 //         }
                 //     />
                 // </Select>
-                <Button attr:style="width: 150px" on:click=generate_markdown appearance=ButtonAppearance::Primary>{t!(i18n, generate_button)}</Button>
+                <Button
+                    attr:style="width: 150px"
+                    on:click=generate_markdown
+                    appearance=ButtonAppearance::Primary
+                >
+                    {t!(i18n, generate_button)}
+                </Button>
             </Flex>
         </Flex>
     }

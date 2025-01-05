@@ -1,5 +1,5 @@
 use leptos::prelude::mount_to_body;
-use leptos::*;
+use leptos::view;
 use thaw::{ConfigProvider, ToasterProvider};
 
 use md_minutes_generator_ui::component::app::App;
@@ -13,7 +13,7 @@ fn main() {
             <I18nContextProvider>
                 <ConfigProvider>
                     <ToasterProvider>
-                        <App/>
+                        <App />
                     </ToasterProvider>
                 </ConfigProvider>
             </I18nContextProvider>
