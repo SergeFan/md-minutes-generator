@@ -29,7 +29,7 @@ pub fn App() -> impl IntoView {
     let worksheet_options = RwSignal::new(Vec::new());
     let selected_worksheet = RwSignal::new(String::new());
 
-    let settings = LocalResource::new(move || get_app_settings(language, direct_generation));
+    let settings = LocalResource::new(get_app_settings);
 
     // Drag & drop handler
     spawn_local(drag_drop(file_path));
@@ -75,6 +75,9 @@ pub fn App() -> impl IntoView {
                         "sc" => i18n.set_locale(Locale::sc),
                         _ => i18n.set_locale(Locale::en),
                     };
+
+                    language.set(settings.language.to_owned());
+                    direct_generation.set(settings.direct_generation);
 
                     view! {
                         <AppSetting open_settings language direct_generation/>

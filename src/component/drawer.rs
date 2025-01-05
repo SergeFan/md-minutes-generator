@@ -44,7 +44,7 @@ pub fn AppSetting(
         if save_action.get() {
             match save_pattern.get() {
                 SavePattern::Save => spawn_local(set_app_settings(language, direct_generation)),
-                SavePattern::Reset => spawn_local(reset_app_settings(language, direct_generation)),
+                SavePattern::Reset => spawn_local(reset_app_settings()),
                 SavePattern::Cancel => {}
             }
         }
