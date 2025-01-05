@@ -8,7 +8,8 @@ pub fn Header(open_settings: RwSignal<bool>) -> impl IntoView {
     view! {
         <Flex vertical=true>
             <Flex justify=FlexJustify::End>
-                <Button attr:style="position: relative; top: 2em; right: 2em;"
+                <Button
+                    attr:style="position: relative; top: 2em; right: 2em;"
                     icon=icondata::OcGearSm
                     appearance=ButtonAppearance::Subtle
                     on_click=move |_| open_settings.set(true)
