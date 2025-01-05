@@ -3,13 +3,13 @@ use leptos::leptos_dom::logging::console_warn;
 use leptos::prelude::{Effect, Get, RwSignal, Set};
 use leptos::{component, view, IntoView};
 use leptos_i18n::t_string;
-use thaw::{MessageBar, MessageBarBody, MessageBarIntent, MessageBarTitle};
+use thaw::*;
 
 use crate::handler::{match_worksheet_name, MatchResult};
 use crate::i18n::use_i18n;
 
 #[component]
-pub fn FileStatus(selected_worksheet: RwSignal<String>) -> impl IntoView {
+pub fn InputStatus(selected_worksheet: RwSignal<String>) -> impl IntoView {
     let i18n = use_i18n();
 
     let message_intent = RwSignal::new(MessageBarIntent::Info);
@@ -33,11 +33,13 @@ pub fn FileStatus(selected_worksheet: RwSignal<String>) -> impl IntoView {
     );
 
     view! {
-        <MessageBar intent=message_intent>
-            <MessageBarBody>
-                <MessageBarTitle>{message_title}</MessageBarTitle>
-                {message_body}
-            </MessageBarBody>
-        </MessageBar>
+        <Flex justify=FlexJustify::Center>
+            <MessageBar intent=message_intent>
+                <MessageBarBody>
+                    <MessageBarTitle>{message_title}</MessageBarTitle>
+                    {message_body}
+                </MessageBarBody>
+            </MessageBar>
+        </Flex>
     }
 }

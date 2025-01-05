@@ -25,7 +25,7 @@
   "toast_title_error": "生成失敗",
   "toast_body_error": "Markdownの生成は取り消されました。",
   "dialog_title": "注意",
-  "dialog_body": "設定を反映するためにマニュアルの再起動が必要です。よろしいでしょうか？",
+  "dialog_body": "設定を反映するためにアプリの再起動が必要です。よろしいですか？",
   "dialog_button_confirm": "はい",
   "dialog_button_cancel": "いいえ"
 }
