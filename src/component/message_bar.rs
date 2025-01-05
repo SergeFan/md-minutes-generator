@@ -1,5 +1,6 @@
 use chrono::Local;
 use leptos::leptos_dom::logging::console_warn;
+use leptos::prelude::AddAnyAttr;
 use leptos::prelude::{Effect, Get, RwSignal, Set};
 use leptos::{component, view, IntoView};
 use leptos_i18n::t_string;
@@ -34,7 +35,7 @@ pub fn InputStatus(selected_worksheet: RwSignal<String>) -> impl IntoView {
 
     view! {
         <Flex justify=FlexJustify::Center>
-            <MessageBar intent=message_intent>
+            <MessageBar attr:style="position: relative; top: 2em;" intent=message_intent>
                 <MessageBarBody>
                     <MessageBarTitle>{message_title}</MessageBarTitle>
                     {message_body}

@@ -93,8 +93,6 @@ pub fn App() -> impl IntoView {
                                     worksheet_options
                                 />
 
-                                <br />
-
                                 <InputStatus selected_worksheet />
                             }
                         })
