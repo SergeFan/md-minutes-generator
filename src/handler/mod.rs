@@ -5,7 +5,7 @@ pub mod settings;
 
 use chrono::{DateTime, Local};
 use js_sys::try_iter;
-use leptos::prelude::{Get, GetUntracked, RwSignal, Set};
+use leptos::prelude::{GetUntracked, RwSignal, Set};
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::prelude::wasm_bindgen;
 use wasm_bindgen::JsValue;
