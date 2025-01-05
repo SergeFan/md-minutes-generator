@@ -19,6 +19,7 @@ use crate::i18n::*;
 pub fn App() -> impl IntoView {
     let i18n = use_i18n();
     let toaster = ToasterInjection::expect_context();
+    let settings = LocalResource::new(get_app_settings);
 
     let open_settings = RwSignal::new(false);
     let language = RwSignal::new(String::new());
@@ -28,8 +29,6 @@ pub fn App() -> impl IntoView {
     let markdown_path = RwSignal::new(String::new());
     let worksheet_options = RwSignal::new(Vec::new());
     let selected_worksheet = RwSignal::new(String::new());
-
-    let settings = LocalResource::new(get_app_settings);
 
     // Drag & drop handler
     spawn_local(drag_drop(file_path));
@@ -80,11 +79,11 @@ pub fn App() -> impl IntoView {
                     direct_generation.set(settings.direct_generation);
 
                     view! {
-                        <AppSetting open_settings language direct_generation/>
+                        <AppSetting open_settings language direct_generation />
 
                         <UsageGuide />
 
-                        <InputSection file_path markdown_path selected_worksheet worksheet_options/>
+                        <InputSection file_path markdown_path selected_worksheet worksheet_options />
 
                         <br />
 

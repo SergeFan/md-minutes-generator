@@ -75,9 +75,9 @@ pub fn AppSetting(
                 </Flex>
                 <Flex vertical=true>
                     <p><b>{t!(i18n, app_setting_direct_generation)}</b></p>
-                    <Switch checked=direct_generation/>
+                    <Switch checked=direct_generation />
                     <p>
-                        {t!(i18n, app_setting_note, <b> = <b/>)}
+                        {t!(i18n, app_setting_note, <b> = <b />)}
                     </p>
                 </Flex>
                 <Flex justify=FlexJustify::SpaceBetween>
@@ -87,6 +87,6 @@ pub fn AppSetting(
             </DrawerBody>
         </OverlayDrawer>
 
-        <ApplySettingDialog open=open_dialog action=save_action/>
+        <ApplySettingDialog open=open_dialog action=save_action />
     }
 }
