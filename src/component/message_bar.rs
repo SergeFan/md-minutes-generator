@@ -1,6 +1,6 @@
 use chrono::Local;
 use leptos::leptos_dom::logging::console_warn;
-use leptos::prelude::{Effect, RwSignal, Set};
+use leptos::prelude::{Effect, Get, RwSignal, Set};
 use leptos::{component, view, IntoView};
 use leptos_i18n::t_string;
 use thaw::{MessageBar, MessageBarBody, MessageBarIntent, MessageBarTitle};
@@ -17,7 +17,7 @@ pub fn FileStatus(selected_worksheet: RwSignal<String>) -> impl IntoView {
     let message_body = RwSignal::new(t_string!(i18n, message_bar_body_info));
 
     Effect::new(
-        move || match match_worksheet_name(selected_worksheet, Local::now()) {
+        move || match match_worksheet_name(selected_worksheet.get(), Local::now()) {
             MatchResult::Match => {
                 message_intent.set(MessageBarIntent::Success);
                 message_title.set(t_string!(i18n, message_bar_title_success));

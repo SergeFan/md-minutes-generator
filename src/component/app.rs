@@ -50,7 +50,8 @@ pub fn App() -> impl IntoView {
                 .await;
 
                 if direct_generation.get_untracked()
-                    && match_worksheet_name(selected_worksheet, Local::now()) == MatchResult::Match
+                    && match_worksheet_name(selected_worksheet.get_untracked(), Local::now())
+                        == MatchResult::Match
                 {
                     spawn_local(generate_markdown(
                         file_path,
@@ -84,7 +85,29 @@ pub fn App() -> impl IntoView {
 
     view! {
         <main class="container">
-            <Transition>
+            <Flex vertical=true>
+                <Flex justify=FlexJustify::End>
+                    <Button
+                        icon=icondata::OcGearSm
+                        appearance=ButtonAppearance::Subtle
+                        on_click=move |_| open_settings.set(true)
+                    />
+                </Flex>
+                <Flex justify=FlexJustify::Center>
+                    <h1>"Powered by Tauri + Leptos"</h1>
+                </Flex>
+            </Flex>
+
+            <div class="row">
+                <a href="https://tauri.app" target="_blank">
+                    <img src="public/tauri.svg" class="logo tauri" alt="Tauri logo"/>
+                </a>
+                <a href="https://leptos.dev" target="_blank">
+                    <img src="public/leptos.svg" class="logo leptos" alt="Leptos logo"/>
+                </a>
+            </div>
+
+            <Suspense>
                 {move || {settings.read().as_deref().map(|a| {
                     match a.language.as_str() {
                         "en" => i18n.set_locale(Locale::en),
@@ -95,28 +118,6 @@ pub fn App() -> impl IntoView {
 
                     view! {
                         <AppSetting open_settings language direct_generation/>
-
-                        <Flex vertical=true>
-                            <Flex justify=FlexJustify::End>
-                                <Button
-                                    icon=icondata::OcGearSm
-                                    appearance=ButtonAppearance::Subtle
-                                    on_click=move |_| open_settings.set(true)
-                                />
-                            </Flex>
-                            <Flex justify=FlexJustify::Center>
-                                <h1>"Powered by Tauri + Leptos"</h1>
-                            </Flex>
-                        </Flex>
-
-                        <div class="row">
-                            <a href="https://tauri.app" target="_blank">
-                                <img src="public/tauri.svg" class="logo tauri" alt="Tauri logo"/>
-                            </a>
-                            <a href="https://leptos.dev" target="_blank">
-                                <img src="public/leptos.svg" class="logo leptos" alt="Leptos logo"/>
-                            </a>
-                        </div>
 
                         <p>
                             {t!(i18n, usage_guide_1, <b> = <b/>)}<br/>
@@ -139,15 +140,7 @@ pub fn App() -> impl IntoView {
                             </Flex>
                             <Flex justify=FlexJustify::Center>
                                 <Combobox attr:style="width: 300px" value=selected_worksheet placeholder=t_string!(i18n, target_worksheet_placeholder)>
-                                    <For
-                                        each=move || worksheet_options.get()
-                                        key=move |worksheet_option| worksheet_option.clone()
-                                        children=move |worksheet_option| {
-                                            view!{
-                                                <ComboboxOption text={worksheet_option}/>
-                                            }
-                                        }
-                                    />
+                                    {worksheet_options.get().iter().map(|option| view! {<ComboboxOption text=option/>}).collect_view()}
                                 </Combobox>
                                 // <Select attr:style="width: 300px" value=selected_worksheet default_value=selected_worksheet.get_untracked()>
                                 //     <For
@@ -171,7 +164,7 @@ pub fn App() -> impl IntoView {
                         </Flex>
                     }
                 })}}
-            </Transition>
+            </Suspense>
         </main>
     }
 }

@@ -31,12 +31,7 @@ pub enum MatchResult {
     WorksheetNotFound,
 }
 
-pub fn match_worksheet_name(
-    selected_worksheet: RwSignal<String>,
-    date: DateTime<Local>,
-) -> MatchResult {
-    let selected_worksheet = selected_worksheet.get();
-
+pub fn match_worksheet_name(selected_worksheet: String, date: DateTime<Local>) -> MatchResult {
     if selected_worksheet.is_empty() {
         return MatchResult::WorksheetNotFound;
     }
