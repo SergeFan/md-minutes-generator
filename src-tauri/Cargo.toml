@@ -1,6 +1,6 @@
 [package]
 name = "md-minutes-generator"
-version = "0.6.0-rc2"
+version = "0.6.0"
 description = "Generate markdown meeting minutes from Excel"
 authors = ["Jaeson Fan - sergefan@live.com"]
 edition = "2021"
