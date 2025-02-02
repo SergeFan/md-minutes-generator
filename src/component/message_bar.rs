@@ -1,7 +1,6 @@
 use chrono::Local;
 use leptos::leptos_dom::logging::console_warn;
-use leptos::prelude::AddAnyAttr;
-use leptos::prelude::{Effect, Get, RwSignal, Set};
+use leptos::prelude::*;
 use leptos::{component, view, IntoView};
 use leptos_i18n::t_string;
 use thaw::*;
