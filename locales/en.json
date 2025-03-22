@@ -25,7 +25,7 @@
   "toast_title_error": "Failed!",
   "toast_body_error": "Markdown generation has been cancelled.",
   "dialog_title": "Caution",
-  "dialog_body": "Manually restart App to apply the settings. Do you want to continue?",
+  "dialog_body": "App will restart to apply the settings. Do you want to continue?",
   "dialog_button_confirm": "Confirm",
   "dialog_button_cancel": "Cancel"
 }

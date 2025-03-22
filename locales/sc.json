@@ -25,7 +25,7 @@
   "toast_title_error": "失败",
   "toast_body_error": "Markdown生成已取消。",
   "dialog_title": "注意",
-  "dialog_body": "为了反映设定内容需手动重启应用。是否确定？",
+  "dialog_body": "为反映设定内容应用将会重启。是否继续？",
   "dialog_button_confirm": "是",
   "dialog_button_cancel": "否"
 }

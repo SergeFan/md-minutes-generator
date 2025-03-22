@@ -2796,7 +2796,7 @@ checksum = "2532096657941c2fea9c289d370a250971c689d4f143798ff67113ec042024a5"
 
 [[package]]
 name = "md-minutes-generator"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "anyhow",
  "calamine",
@@ -2814,7 +2814,7 @@ dependencies = [
 
 [[package]]
 name = "md-minutes-generator-ui"
-version = "0.6.0"
+version = "0.6.1"
 dependencies = [
  "chrono",
  "console_error_panic_hook",
