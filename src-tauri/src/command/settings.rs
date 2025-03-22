@@ -31,7 +31,7 @@ pub fn reset_app_settings(app_handle: AppHandle) {
     app_handle.store("store.json").unwrap().reset();
 
     // TODO: this should be `restart()`, waiting for upstream fix
-    app_handle.exit(0);
+    app_handle.request_restart();
 }
 
 #[tauri::command]
@@ -42,5 +42,5 @@ pub fn set_app_settings(app_handle: AppHandle, language: &str, direct_generation
     store.set("direct_generation", json!({"value": direct_generation}));
 
     // TODO: this should be `restart()`, waiting for upstream fix
-    app_handle.exit(0);
+    app_handle.request_restart();
 }
