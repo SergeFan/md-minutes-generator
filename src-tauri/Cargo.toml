@@ -15,7 +15,7 @@ name = "md_minutes_generator_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2", features = [] }
+tauri-build = { version = "2.1", features = [] }
 
 [dependencies]
 anyhow = "1"
