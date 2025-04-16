@@ -15,7 +15,7 @@ name = "md_minutes_generator_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]
-tauri-build = { version = "2.1", features = [] }
+tauri-build = { version = "2.2", features = [] }
 
 [dependencies]
 anyhow = "1"
@@ -23,7 +23,7 @@ calamine = "0.26"
 directories = "6"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tauri = { version = "2.4", features = [] }
+tauri = { version = "2.5", features = [] }
 tauri-plugin-dialog = "2.2"
 tauri-plugin-fs = "2.2"
 tauri-plugin-process = "2.2"
