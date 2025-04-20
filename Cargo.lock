@@ -5210,9 +5210,9 @@ dependencies = [
 
 [[package]]
 name = "thaw"
-version = "0.4.5"
+version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "574bb0ecc80bb659b513728afceb5cbaf03ed0207ca636f176a4b328d8d3c14d"
+checksum = "c3cb1c56a9dd5f6065c89b404887e200deff2ae7756fa74a7481b0aed037ecd3"
 dependencies = [
  "cfg-if",
  "chrono",
